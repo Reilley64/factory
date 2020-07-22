@@ -1,7 +1,7 @@
 package me.reilley.factory;
 
-import me.reilley.factory.blocks.Quarry;
-import me.reilley.factory.blocks.QuarryEntity;
+import me.reilley.factory.blocks.quarry.QuarryBlock;
+import me.reilley.factory.blocks.quarry.QuarryBlockEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.block.Block;
@@ -15,17 +15,21 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class Factory implements ModInitializer {
+    public static final String MOD_ID = "factory";
+
     public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.build(
-            new Identifier("factory", "factory"),
+            new Identifier(MOD_ID, "general"),
             () -> new ItemStack(Blocks.COBBLESTONE)
     );
 
-    public static final Block QUARRY = new Quarry();
-    public static BlockEntityType<QuarryEntity> QUARRY_ENTITY;
+    public static final Block QUARRY = new QuarryBlock();
+    public static final Identifier QUARRY_IDENTIFIER = new Identifier(MOD_ID, "quarry");
+    public static BlockEntityType<QuarryBlockEntity> QUARRY_ENTITY_TYPE;
 
     @Override
     public void onInitialize() {
-        QUARRY_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("factory", "quarry"), BlockEntityType.Builder.create(QuarryEntity::new, QUARRY).build(null));
-        Registry.register(Registry.ITEM, new Identifier("factory", "quarry"), new BlockItem(QUARRY, new Item.Settings().group(ITEM_GROUP)));
+        Registry.register(Registry.BLOCK, QUARRY_IDENTIFIER, QUARRY);
+        Registry.register(Registry.ITEM, QUARRY_IDENTIFIER, new BlockItem(QUARRY, new Item.Settings().group(ITEM_GROUP)));
+        QUARRY_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, QUARRY_IDENTIFIER, BlockEntityType.Builder.create(QuarryBlockEntity::new, QUARRY).build(null));
     }
 }
