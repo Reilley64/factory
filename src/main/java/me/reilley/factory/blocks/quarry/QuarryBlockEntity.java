@@ -13,12 +13,15 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
-public class QuarryBlockEntity extends LootableContainerBlockEntity {
+public class QuarryBlockEntity extends LootableContainerBlockEntity implements Tickable {
     private DefaultedList<ItemStack> inventory;
     protected int viewerCount;
+    private int delay = 20;
+    private BlockPos targetBlock;
 
     public QuarryBlockEntity() {
         super(Factory.QUARRY_ENTITY_TYPE);
@@ -108,11 +111,18 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity {
     }
 
     public void tick(){
-        this.removeBlock();
+        --this.delay;
+        if (this.delay <= 0) {
+            this.removeBlock();
+        }
     }
 
     private void removeBlock() {
-        BlockPos targetBlock = this.getPos().north(1);
+        if(targetBlock == null){
+            targetBlock = this.getPos().north().down();
+        } else {
+            targetBlock = targetBlock.north();
+        }
         assert this.world != null;
         if (!this.world.isClient) {
             this.world.removeBlock(targetBlock, false);
