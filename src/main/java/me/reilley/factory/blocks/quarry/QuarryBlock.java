@@ -1,5 +1,6 @@
 package me.reilley.factory.blocks.quarry;
 
+import me.reilley.factory.Factory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
@@ -43,6 +45,14 @@ public class QuarryBlock extends BlockWithEntity {
         if (world.isClient) {
             return ActionResult.SUCCESS;
         } else {
+            world.playSound(
+                    null,
+                    pos,
+                    Factory.HELLO_EVENT,
+                    SoundCategory.BLOCKS,
+                    1f,
+                    1f
+            );
             NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
             if (namedScreenHandlerFactory != null) {
                 player.openHandledScreen(namedScreenHandlerFactory);
@@ -61,7 +71,6 @@ public class QuarryBlock extends BlockWithEntity {
                 ItemScatterer.spawn(world, pos, (Inventory)blockEntity);
                 world.updateComparators(pos, this);
             }
-
             super.onStateReplaced(state, world, pos, newState, moved);
         }
     }

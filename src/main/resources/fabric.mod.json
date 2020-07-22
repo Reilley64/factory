@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "factory",
   "version": "${version}",
   "name": "Factory",
   "description": "",
@@ -12,7 +12,7 @@
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/factory/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
