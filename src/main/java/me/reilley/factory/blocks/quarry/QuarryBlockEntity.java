@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
@@ -18,6 +20,8 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
 public class QuarryBlockEntity extends LootableContainerBlockEntity implements Tickable {
+    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+
     private DefaultedList<ItemStack> inventory;
     protected int viewerCount;
     private int delay = 20;
@@ -114,15 +118,51 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         --this.delay;
         if (this.delay <= 0) {
             this.removeBlock();
+            delay = 20;
         }
     }
 
     private void removeBlock() {
-        if(targetBlock == null){
-            targetBlock = this.getPos().north().down();
+        System.out.println(this.world.getBlockState(this.getPos()).get(FACING));
+        if (targetBlock != null) System.out.println(targetBlock.toString());
+        if (targetBlock == null) {
+            switch(this.world.getBlockState(this.getPos()).get(FACING)) {
+                case NORTH:
+                    targetBlock = this.getPos().add(0, -1, 1);
+                    break;
+
+                case EAST:
+                    targetBlock = this.getPos().add(-1, -1, 0);
+                    break;
+
+                case SOUTH:
+                    targetBlock = this.getPos().add(0, -1, -1);
+                    break;
+
+                case WEST:
+                    targetBlock = this.getPos().add(1, -1, 0);
+                    break;
+            }
         } else {
-            targetBlock = targetBlock.north();
+            switch(this.world.getBlockState(this.getPos()).get(FACING)) {
+                case NORTH:
+                    targetBlock = targetBlock.add(0, 0, 1);
+                    break;
+
+                case EAST:
+                    targetBlock = targetBlock.add(-1, 0, 0);
+                    break;
+
+                case SOUTH:
+                    targetBlock = targetBlock.add(0, 0, -1);
+                    break;
+
+                case WEST:
+                    targetBlock = targetBlock.add(1, 0, 0);
+                    break;
+            }
         }
+
         assert this.world != null;
         if (!this.world.isClient) {
             this.world.removeBlock(targetBlock, false);

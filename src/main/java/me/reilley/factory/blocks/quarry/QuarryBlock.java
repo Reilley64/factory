@@ -2,32 +2,53 @@ package me.reilley.factory.blocks.quarry;
 
 import me.reilley.factory.Factory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class QuarryBlock extends BlockWithEntity {
+    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+
     public QuarryBlock() {
-        super(
-                FabricBlockSettings.of(Material.METAL)
-                        .breakByHand(false)
-                        .breakByTool(FabricToolTags.PICKAXES)
-                        .sounds(BlockSoundGroup.METAL)
-                        .strength(5, 6)
-        );
+        super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH));
+    }
+
+    public Direction getFacing(BlockState state) {
+        return state.get(FACING);
+    }
+
+    public void setFacing(Direction facing, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.onPlaced(world, pos, state, placer, stack);
+        setFacing(placer.getHorizontalFacing().getOpposite(), world, pos);
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
+        builder.add(FACING);
     }
 
     @Override
