@@ -1,6 +1,7 @@
 package me.reilley.factory.blocks.quarry;
 
 import me.reilley.factory.Factory;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.*;
@@ -8,9 +9,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -19,13 +24,24 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.List;
+
 public class QuarryBlockEntity extends LootableContainerBlockEntity implements Tickable {
+    private enum DiggingDirection {
+        NORTH, EAST, SOUTH, WEST;
+    }
+
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     private DefaultedList<ItemStack> inventory;
     protected int viewerCount;
     private int delay = 20;
     private BlockPos targetBlock;
+    private DiggingDirection diggingDirection;
+    private int minX;
+    private int minZ;
+    private int maxX;
+    private int maxZ;
 
     public QuarryBlockEntity() {
         super(Factory.QUARRY_ENTITY_TYPE);
@@ -114,58 +130,177 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         }
     }
 
-    public void tick(){
+    @Override
+    public void tick() {
         --this.delay;
         if (this.delay <= 0) {
             this.removeBlock();
-            delay = 20;
+            delay = 5;
         }
     }
 
     private void removeBlock() {
-        System.out.println(this.world.getBlockState(this.getPos()).get(FACING));
-        if (targetBlock != null) System.out.println(targetBlock.toString());
+        assert this.world != null;
+
         if (targetBlock == null) {
-            switch(this.world.getBlockState(this.getPos()).get(FACING)) {
+            switch (this.world.getBlockState(this.getPos()).get(FACING)) {
                 case NORTH:
-                    targetBlock = this.getPos().add(0, -1, 1);
+                    targetBlock = this.getPos().add(7, 14, 2);
+                    diggingDirection = DiggingDirection.WEST;
+                    minX = targetBlock.getX();
+                    minZ = targetBlock.getZ();
+                    maxX = minX - 14;
+                    maxZ = minZ + 14;
                     break;
 
                 case EAST:
-                    targetBlock = this.getPos().add(-1, -1, 0);
+                    targetBlock = this.getPos().add(-2, 14, 7);
+                    diggingDirection = DiggingDirection.NORTH;
+                    minX = targetBlock.getX();
+                    minZ = targetBlock.getZ();
+                    maxX = minX - 14;
+                    maxZ = minZ - 14;
                     break;
 
                 case SOUTH:
-                    targetBlock = this.getPos().add(0, -1, -1);
+                    targetBlock = this.getPos().add(-7, 14, -2);
+                    diggingDirection = DiggingDirection.EAST;
+                    minX = targetBlock.getX();
+                    minZ = targetBlock.getZ();
+                    maxX = minX + 14;
+                    maxZ = minZ - 14;
                     break;
 
                 case WEST:
-                    targetBlock = this.getPos().add(1, -1, 0);
+                    targetBlock = this.getPos().add(2, 14, -7);
+                    diggingDirection = DiggingDirection.SOUTH;
+                    minX = targetBlock.getX();
+                    minZ = targetBlock.getZ();
+                    maxX = minX + 14;
+                    maxZ = minZ + 14;
                     break;
             }
         } else {
-            switch(this.world.getBlockState(this.getPos()).get(FACING)) {
-                case NORTH:
-                    targetBlock = targetBlock.add(0, 0, 1);
-                    break;
-
-                case EAST:
-                    targetBlock = targetBlock.add(-1, 0, 0);
-                    break;
-
-                case SOUTH:
-                    targetBlock = targetBlock.add(0, 0, -1);
-                    break;
-
-                case WEST:
-                    targetBlock = targetBlock.add(1, 0, 0);
-                    break;
+            while (this.world.getBlockState(targetBlock).getBlock() == null
+                    || this.world.getBlockState(targetBlock).getBlock() instanceof AirBlock) {
+                targetBlock = getNextBlockPos(targetBlock);
             }
         }
 
-        assert this.world != null;
         if (!this.world.isClient) {
+            BlockEntity blockEntity = this.world.getBlockEntity(targetBlock);
+            LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).random(this.world.random).parameter(LootContextParameters.POSITION, targetBlock).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
+            List<ItemStack> droppedItems = this.world.getBlockState(targetBlock).getDroppedStacks(builder);
+            for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
             this.world.removeBlock(targetBlock, false);
+        }
+    }
+
+    private BlockPos getNextBlockPos(BlockPos currentPos) {
+        switch (this.world.getBlockState(this.getPos()).get(FACING)) {
+            case NORTH:
+                switch (diggingDirection) {
+                    case EAST:
+                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.SOUTH;
+                        break;
+
+                    case SOUTH:
+                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.WEST;
+                        else if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.EAST;
+                        break;
+
+                    case WEST:
+                        if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.SOUTH;
+                        break;
+                }
+                break;
+
+            case EAST:
+                switch (diggingDirection) {
+                    case NORTH:
+                        if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.WEST;
+                        break;
+
+                    case SOUTH:
+                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.WEST;
+                        break;
+
+                    case WEST:
+                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.NORTH;
+                        else if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.SOUTH;
+                        break;
+                }
+                break;
+
+            case SOUTH:
+                switch (diggingDirection) {
+                    case NORTH:
+                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.EAST;
+                        else if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.WEST;
+                        break;
+
+                    case EAST:
+                        if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.NORTH;
+                        break;
+
+                    case WEST:
+                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.NORTH;
+                        break;
+                }
+                break;
+
+            case WEST:
+                switch (diggingDirection) {
+                    case NORTH:
+                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.EAST;
+                        break;
+
+                    case EAST:
+                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.SOUTH;
+                        else if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.NORTH;
+                        break;
+
+                    case SOUTH:
+                        if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.EAST;
+                        break;
+                }
+                break;
+        }
+
+        if (currentPos.getX() == maxX && currentPos.getZ() == maxZ) {
+            return new BlockPos(minX, currentPos.getY() - 1, minZ);
+        } else {
+            switch (diggingDirection) {
+                case NORTH:
+                    return currentPos.add(0, 0, -1);
+
+                case EAST:
+                    return currentPos.add(1, 0, 0);
+
+                case SOUTH:
+                    return currentPos.add(0, 0, 1);
+
+                case WEST:
+                    return currentPos.add(-1, 0, 0);
+            }
+        }
+
+        return currentPos;
+    }
+
+    private void addItemStackToInventory(DefaultedList<ItemStack> inventory, ItemStack itemStack) {
+        for (ItemStack stack : inventory) {
+            if (stack.isItemEqual(itemStack) && stack.getCount() + itemStack.getCount() <= stack.getMaxCount()) {
+                stack.setCount(stack.getCount() + itemStack.getCount());
+                return;
+            }
+        }
+
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).isEmpty()) {
+                inventory.set(i, itemStack);
+                return;
+            }
         }
     }
 }
