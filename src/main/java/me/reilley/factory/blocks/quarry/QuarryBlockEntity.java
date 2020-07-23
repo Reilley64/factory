@@ -144,6 +144,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         assert this.world != null;
 
         if (targetBlock == null) {
+            this.world.setBlockState(this.getPos().add(0, 1, 0), new FrameBlock().getDefaultState());
             switch (this.world.getBlockState(this.getPos()).get(FACING)) {
                 case NORTH:
                     targetBlock = this.getPos().add(7, 14, 2);

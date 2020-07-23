@@ -27,6 +27,9 @@ public class Factory implements ModInitializer {
     public static final Identifier QUARRY_IDENTIFIER = new Identifier(MOD_ID, "quarry");
     public static BlockEntityType<QuarryBlockEntity> QUARRY_ENTITY_TYPE;
 
+    public static final Block FRAME_BLOCK = new QuarryBlock();
+    public static final Identifier FRAME_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "frame_block");
+
     public static final Identifier HELLO_ID = new Identifier("factory:hello");
     public static SoundEvent HELLO_EVENT = new SoundEvent(HELLO_ID);
 
@@ -35,6 +38,10 @@ public class Factory implements ModInitializer {
         Registry.register(Registry.BLOCK, QUARRY_IDENTIFIER, QUARRY);
         Registry.register(Registry.ITEM, QUARRY_IDENTIFIER, new BlockItem(QUARRY, new Item.Settings().group(ITEM_GROUP)));
         QUARRY_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, QUARRY_IDENTIFIER, BlockEntityType.Builder.create(QuarryBlockEntity::new, QUARRY).build(null));
+
+        Registry.register(Registry.BLOCK, FRAME_BLOCK_IDENTIFIER, FRAME_BLOCK);
+        Registry.register(Registry.ITEM, FRAME_BLOCK_IDENTIFIER, new BlockItem(FRAME_BLOCK, new Item.Settings().group(ITEM_GROUP)));
+
         Registry.register(Registry.SOUND_EVENT, Factory.HELLO_ID, HELLO_EVENT);
     }
 }
