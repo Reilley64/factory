@@ -4,10 +4,13 @@ import me.reilley.factory.Factory;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.*;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.EmptyFluid;
+import net.minecraft.fluid.LavaFluid;
+import net.minecraft.fluid.WaterFluid;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,8 +20,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
@@ -29,10 +30,8 @@ import java.util.List;
 
 public class QuarryBlockEntity extends LootableContainerBlockEntity implements Tickable {
     private enum DiggingDirection {
-        NORTH, EAST, SOUTH, WEST;
+        NORTH, EAST, SOUTH, WEST
     }
-
-    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     private DefaultedList<ItemStack> inventory;
     protected int viewerCount;
@@ -145,7 +144,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
 
         if (targetBlock == null) {
             this.world.setBlockState(this.getPos().add(0, 1, 0), new FrameBlock().getDefaultState());
-            switch (this.world.getBlockState(this.getPos()).get(FACING)) {
+            switch (this.world.getBlockState(this.getPos()).get(QuarryBlock.FACING)) {
                 case NORTH:
                     targetBlock = this.getPos().add(7, 14, 2);
                     diggingDirection = DiggingDirection.WEST;
@@ -184,7 +183,9 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
             }
         } else {
             while (this.world.getBlockState(targetBlock).getBlock() == null
-                    || this.world.getBlockState(targetBlock).getBlock() instanceof AirBlock) {
+                    || this.world.getBlockState(targetBlock).getBlock() instanceof AirBlock
+                    || (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)
+                    && !this.world.getBlockState(targetBlock).getFluidState().isStill())) {
                 targetBlock = getNextBlockPos(targetBlock);
             }
         }
@@ -193,15 +194,21 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
             BlockEntity blockEntity = this.world.getBlockEntity(targetBlock);
             LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).random(this.world.random).parameter(LootContextParameters.POSITION, targetBlock).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
             List<ItemStack> droppedItems = this.world.getBlockState(targetBlock).getDroppedStacks(builder);
-            for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-            //fix me
-            this.world.breakBlock(targetBlock, false);
-
+            if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
+                for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
+                System.out.println(targetBlock.toString());
+                if (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)) {
+                    this.world.setBlockState(targetBlock, Blocks.COBBLESTONE.getDefaultState());
+                    this.world.removeBlock(targetBlock, false);
+                } else {
+                    this.world.breakBlock(targetBlock, false);
+                }
+            }
         }
     }
 
     private BlockPos getNextBlockPos(BlockPos currentPos) {
-        switch (this.world.getBlockState(this.getPos()).get(FACING)) {
+        switch (this.world.getBlockState(this.getPos()).get(QuarryBlock.FACING)) {
             case NORTH:
                 switch (diggingDirection) {
                     case EAST:
@@ -290,6 +297,31 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         }
 
         return currentPos;
+    }
+
+    private boolean canItemStacksBeAddedToInventory(DefaultedList<ItemStack> inventory, List<ItemStack> itemStacks) {
+        for (ItemStack itemStack : itemStacks) {
+            boolean canInsert = false;
+
+            for (ItemStack stack : inventory) {
+                if (stack.isItemEqual(itemStack) && stack.getCount() + itemStack.getCount() <= stack.getMaxCount()) {
+                    canInsert = true;
+                    break;
+                }
+            }
+
+            for (ItemStack stack : inventory) {
+                if (stack.isEmpty()) {
+                    canInsert = true;
+                    break;
+                }
+            }
+
+            if (canInsert) continue;
+            return false;
+        }
+
+        return true;
     }
 
     private void addItemStackToInventory(DefaultedList<ItemStack> inventory, ItemStack itemStack) {
