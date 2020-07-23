@@ -5,6 +5,7 @@ import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.*;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -192,7 +193,9 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
             LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).random(this.world.random).parameter(LootContextParameters.POSITION, targetBlock).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
             List<ItemStack> droppedItems = this.world.getBlockState(targetBlock).getDroppedStacks(builder);
             for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-            this.world.removeBlock(targetBlock, false);
+            //fix me
+            this.world.breakBlock(targetBlock, false);
+
         }
     }
 
