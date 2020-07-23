@@ -184,6 +184,8 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         } else {
             while (this.world.getBlockState(targetBlock).getBlock() == null
                     || this.world.getBlockState(targetBlock).getBlock() instanceof AirBlock
+                    || this.world.getBlockState(targetBlock).getHardness(this.world, targetBlock) < 0.0F
+                    || !(this.world.getBlockState(targetBlock.add(0, 1, 0)).getBlock() instanceof AirBlock)
                     || (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)
                     && !this.world.getBlockState(targetBlock).getFluidState().isStill())) {
                 targetBlock = getNextBlockPos(targetBlock);
@@ -196,7 +198,6 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
             List<ItemStack> droppedItems = this.world.getBlockState(targetBlock).getDroppedStacks(builder);
             if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
                 for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-                System.out.println(targetBlock.toString());
                 if (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)) {
                     this.world.setBlockState(targetBlock, Blocks.COBBLESTONE.getDefaultState());
                     this.world.removeBlock(targetBlock, false);
