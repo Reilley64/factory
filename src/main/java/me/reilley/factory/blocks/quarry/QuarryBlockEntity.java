@@ -9,8 +9,6 @@ import net.minecraft.block.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
-import net.minecraft.fluid.LavaFluid;
-import net.minecraft.fluid.WaterFluid;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -25,17 +23,157 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.List;
 
 public class QuarryBlockEntity extends LootableContainerBlockEntity implements Tickable {
+    private abstract static class Task {
+        private int energyRequired;
+
+        public Task(int energyRequired) {
+            energyRequired = energyRequired;
+        }
+
+        public abstract void runTask();
+    }
+
+    private class DigBlockTask extends Task {
+        private final World world;
+        private final BlockPos pos;
+
+        public DigBlockTask(World world, BlockPos pos) {
+            super(20);
+            this.world = world;
+            this.pos = pos;
+        }
+
+        @Override
+        public void runTask() {
+            while (this.world.getBlockState(targetBlock).getBlock() == null
+                    || this.world.getBlockState(targetBlock).getBlock() instanceof AirBlock
+                    || this.world.getBlockState(targetBlock).getHardness(this.world, targetBlock) < 0.0F
+                    || !(this.world.getBlockState(targetBlock.add(0, 1, 0)).getBlock() instanceof AirBlock)
+                    || (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)
+                    && !this.world.getBlockState(targetBlock).getFluidState().isStill())) {
+                targetBlock = getNextBlockPos(targetBlock);
+            }
+
+            if (!this.world.isClient) {
+                BlockEntity blockEntity = this.world.getBlockEntity(targetBlock);
+                LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).random(this.world.random).parameter(LootContextParameters.POSITION, targetBlock).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
+                List<ItemStack> droppedItems = this.world.getBlockState(targetBlock).getDroppedStacks(builder);
+                if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
+                    for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
+                    if (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)) {
+                        this.world.setBlockState(targetBlock, Blocks.COBBLESTONE.getDefaultState());
+                        this.world.removeBlock(targetBlock, false);
+                    } else {
+                        this.world.breakBlock(targetBlock, false);
+                    }
+                }
+            }
+        }
+
+        private BlockPos getNextBlockPos(BlockPos currentPos) {
+            switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
+                case NORTH:
+                    switch (diggingDirection) {
+                        case EAST:
+                            if (currentPos.getX() == minX) diggingDirection = DiggingDirection.SOUTH;
+                            break;
+
+                        case SOUTH:
+                            if (currentPos.getX() == minX) diggingDirection = DiggingDirection.WEST;
+                            else if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.EAST;
+                            break;
+
+                        case WEST:
+                            if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.SOUTH;
+                            break;
+                    }
+                    break;
+
+                case EAST:
+                    switch (diggingDirection) {
+                        case NORTH:
+                            if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.WEST;
+                            break;
+
+                        case SOUTH:
+                            if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.WEST;
+                            break;
+
+                        case WEST:
+                            if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.NORTH;
+                            else if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.SOUTH;
+                            break;
+                    }
+                    break;
+
+                case SOUTH:
+                    switch (diggingDirection) {
+                        case NORTH:
+                            if (currentPos.getX() == minX) diggingDirection = DiggingDirection.EAST;
+                            else if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.WEST;
+                            break;
+
+                        case EAST:
+                            if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.NORTH;
+                            break;
+
+                        case WEST:
+                            if (currentPos.getX() == minX) diggingDirection = DiggingDirection.NORTH;
+                            break;
+                    }
+                    break;
+
+                case WEST:
+                    switch (diggingDirection) {
+                        case NORTH:
+                            if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.EAST;
+                            break;
+
+                        case EAST:
+                            if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.SOUTH;
+                            else if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.NORTH;
+                            break;
+
+                        case SOUTH:
+                            if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.EAST;
+                            break;
+                    }
+                    break;
+            }
+
+            if (currentPos.getX() == maxX && currentPos.getZ() == maxZ) {
+                return new BlockPos(minX, currentPos.getY() - 1, minZ);
+            } else {
+                switch (diggingDirection) {
+                    case NORTH:
+                        return currentPos.add(0, 0, -1);
+
+                    case EAST:
+                        return currentPos.add(1, 0, 0);
+
+                    case SOUTH:
+                        return currentPos.add(0, 0, 1);
+
+                    case WEST:
+                        return currentPos.add(-1, 0, 0);
+                }
+            }
+
+            return currentPos;
+        }
+    }
+
     private enum DiggingDirection {
         NORTH, EAST, SOUTH, WEST
     }
 
     private DefaultedList<ItemStack> inventory;
     protected int viewerCount;
-    private int delay = 20;
     private BlockPos targetBlock;
     private DiggingDirection diggingDirection;
     private int minX;
@@ -132,172 +270,50 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
 
     @Override
     public void tick() {
-        --this.delay;
-        if (this.delay <= 0) {
-            this.removeBlock();
-            delay = 5;
-        }
-    }
-
-    private void removeBlock() {
-        assert this.world != null;
-
-        if (targetBlock == null) {
-            this.world.setBlockState(this.getPos().add(0, 1, 0), new FrameBlock().getDefaultState());
-            switch (this.world.getBlockState(this.getPos()).get(QuarryBlock.FACING)) {
-                case NORTH:
-                    targetBlock = this.getPos().add(7, 14, 2);
-                    diggingDirection = DiggingDirection.WEST;
-                    minX = targetBlock.getX();
-                    minZ = targetBlock.getZ();
-                    maxX = minX - 14;
-                    maxZ = minZ + 14;
-                    break;
-
-                case EAST:
-                    targetBlock = this.getPos().add(-2, 14, 7);
-                    diggingDirection = DiggingDirection.NORTH;
-                    minX = targetBlock.getX();
-                    minZ = targetBlock.getZ();
-                    maxX = minX - 14;
-                    maxZ = minZ - 14;
-                    break;
-
-                case SOUTH:
-                    targetBlock = this.getPos().add(-7, 14, -2);
-                    diggingDirection = DiggingDirection.EAST;
-                    minX = targetBlock.getX();
-                    minZ = targetBlock.getZ();
-                    maxX = minX + 14;
-                    maxZ = minZ - 14;
-                    break;
-
-                case WEST:
-                    targetBlock = this.getPos().add(2, 14, -7);
-                    diggingDirection = DiggingDirection.SOUTH;
-                    minX = targetBlock.getX();
-                    minZ = targetBlock.getZ();
-                    maxX = minX + 14;
-                    maxZ = minZ + 14;
-                    break;
-            }
-        } else {
-            while (this.world.getBlockState(targetBlock).getBlock() == null
-                    || this.world.getBlockState(targetBlock).getBlock() instanceof AirBlock
-                    || this.world.getBlockState(targetBlock).getHardness(this.world, targetBlock) < 0.0F
-                    || !(this.world.getBlockState(targetBlock.add(0, 1, 0)).getBlock() instanceof AirBlock)
-                    || (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)
-                    && !this.world.getBlockState(targetBlock).getFluidState().isStill())) {
-                targetBlock = getNextBlockPos(targetBlock);
-            }
-        }
-
-        if (!this.world.isClient) {
-            BlockEntity blockEntity = this.world.getBlockEntity(targetBlock);
-            LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).random(this.world.random).parameter(LootContextParameters.POSITION, targetBlock).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
-            List<ItemStack> droppedItems = this.world.getBlockState(targetBlock).getDroppedStacks(builder);
-            if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
-                for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-                if (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)) {
-                    this.world.setBlockState(targetBlock, Blocks.COBBLESTONE.getDefaultState());
-                    this.world.removeBlock(targetBlock, false);
-                } else {
-                    this.world.breakBlock(targetBlock, false);
-                }
-            }
-        }
-    }
-
-    private BlockPos getNextBlockPos(BlockPos currentPos) {
-        switch (this.world.getBlockState(this.getPos()).get(QuarryBlock.FACING)) {
-            case NORTH:
-                switch (diggingDirection) {
-                    case EAST:
-                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.SOUTH;
-                        break;
-
-                    case SOUTH:
-                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.WEST;
-                        else if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.EAST;
-                        break;
-
-                    case WEST:
-                        if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.SOUTH;
-                        break;
-                }
-                break;
-
-            case EAST:
-                switch (diggingDirection) {
+        if (world != null) {
+            if (targetBlock == null) {
+                switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
                     case NORTH:
-                        if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.WEST;
-                        break;
-
-                    case SOUTH:
-                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.WEST;
-                        break;
-
-                    case WEST:
-                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.NORTH;
-                        else if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.SOUTH;
-                        break;
-                }
-                break;
-
-            case SOUTH:
-                switch (diggingDirection) {
-                    case NORTH:
-                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.EAST;
-                        else if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.WEST;
+                        targetBlock = this.pos.add(7, 14, 2);
+                        diggingDirection = DiggingDirection.WEST;
+                        minX = targetBlock.getX();
+                        minZ = targetBlock.getZ();
+                        maxX = minX - 14;
+                        maxZ = minZ + 14;
                         break;
 
                     case EAST:
-                        if (currentPos.getX() == maxX) diggingDirection = DiggingDirection.NORTH;
-                        break;
-
-                    case WEST:
-                        if (currentPos.getX() == minX) diggingDirection = DiggingDirection.NORTH;
-                        break;
-                }
-                break;
-
-            case WEST:
-                switch (diggingDirection) {
-                    case NORTH:
-                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.EAST;
-                        break;
-
-                    case EAST:
-                        if (currentPos.getZ() == minZ) diggingDirection = DiggingDirection.SOUTH;
-                        else if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.NORTH;
+                        targetBlock = pos.add(-2, 14, 7);
+                        diggingDirection = DiggingDirection.NORTH;
+                        minX = targetBlock.getX();
+                        minZ = targetBlock.getZ();
+                        maxX = minX - 14;
+                        maxZ = minZ - 14;
                         break;
 
                     case SOUTH:
-                        if (currentPos.getZ() == maxZ) diggingDirection = DiggingDirection.EAST;
+                        targetBlock = pos.add(-7, 14, -2);
+                        diggingDirection = DiggingDirection.EAST;
+                        minX = targetBlock.getX();
+                        minZ = targetBlock.getZ();
+                        maxX = minX + 14;
+                        maxZ = minZ - 14;
+                        break;
+
+                    case WEST:
+                        targetBlock = pos.add(2, 14, -7);
+                        diggingDirection = DiggingDirection.SOUTH;
+                        minX = targetBlock.getX();
+                        minZ = targetBlock.getZ();
+                        maxX = minX + 14;
+                        maxZ = minZ + 14;
                         break;
                 }
-                break;
-        }
-
-        if (currentPos.getX() == maxX && currentPos.getZ() == maxZ) {
-            return new BlockPos(minX, currentPos.getY() - 1, minZ);
-        } else {
-            switch (diggingDirection) {
-                case NORTH:
-                    return currentPos.add(0, 0, -1);
-
-                case EAST:
-                    return currentPos.add(1, 0, 0);
-
-                case SOUTH:
-                    return currentPos.add(0, 0, 1);
-
-                case WEST:
-                    return currentPos.add(-1, 0, 0);
+            } else {
+                DigBlockTask digBlockTask = new DigBlockTask(this.getWorld(), this.getPos());
+                digBlockTask.runTask();
             }
         }
-
-        return currentPos;
     }
 
     private boolean canItemStacksBeAddedToInventory(DefaultedList<ItemStack> inventory, List<ItemStack> itemStacks) {

@@ -1,5 +1,7 @@
 package me.reilley.factory;
 
+import me.reilley.factory.blocks.generator.GeneratorBlock;
+import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
 import me.reilley.factory.blocks.quarry.QuarryBlock;
 import me.reilley.factory.blocks.quarry.QuarryBlockEntity;
 import net.fabricmc.api.ModInitializer;
@@ -30,6 +32,10 @@ public class Factory implements ModInitializer {
     public static final Block FRAME_BLOCK = new QuarryBlock();
     public static final Identifier FRAME_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "frame_block");
 
+    public static final Block GENERATOR = new GeneratorBlock();
+    public static final Identifier GENERATOR_IDENTIFIER = new Identifier(MOD_ID, "generator");
+    public static BlockEntityType<GeneratorBlockEntity> GENERATOR_ENTITY_TYPE;
+
     public static final Identifier HELLO_ID = new Identifier("factory:hello");
     public static SoundEvent HELLO_EVENT = new SoundEvent(HELLO_ID);
 
@@ -41,6 +47,10 @@ public class Factory implements ModInitializer {
 
         Registry.register(Registry.BLOCK, FRAME_BLOCK_IDENTIFIER, FRAME_BLOCK);
         Registry.register(Registry.ITEM, FRAME_BLOCK_IDENTIFIER, new BlockItem(FRAME_BLOCK, new Item.Settings().group(ITEM_GROUP)));
+
+        Registry.register(Registry.BLOCK, GENERATOR_IDENTIFIER, GENERATOR);
+        Registry.register(Registry.ITEM, GENERATOR_IDENTIFIER, new BlockItem(GENERATOR, new Item.Settings().group(ITEM_GROUP)));
+        GENERATOR_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, GENERATOR_IDENTIFIER, BlockEntityType.Builder.create(GeneratorBlockEntity::new, GENERATOR).build(null));
 
         Registry.register(Registry.SOUND_EVENT, Factory.HELLO_ID, HELLO_EVENT);
     }
