@@ -9,6 +9,8 @@ import net.minecraft.block.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
+import net.minecraft.fluid.LavaFluid;
+import net.minecraft.fluid.WaterFluid;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -56,6 +58,10 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
                     || !(this.world.getBlockState(targetBlock.add(0, 1, 0)).getBlock() instanceof AirBlock)
                     || (!(this.world.getBlockState(targetBlock).getFluidState().getFluid() instanceof EmptyFluid)
                     && !this.world.getBlockState(targetBlock).getFluidState().isStill())) {
+                if (targetBlock.getY() < 1) {
+                    active = false;
+                    return;
+                }
                 targetBlock = getNextBlockPos(targetBlock);
             }
 
@@ -168,12 +174,101 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         }
     }
 
+    private class BuildFrameTask extends Task {
+        private final World world;
+        private final BlockPos pos;
+
+        public BuildFrameTask(World world, BlockPos pos) {
+            super(10);
+            this.world = world;
+            this.pos = pos;
+        }
+
+        @Override
+        public void runTask() {
+            while (this.world.getBlockState(targetBlock).getBlock() instanceof FrameBlock) {
+                targetBlock = getNextFramePos(targetBlock);
+                if (targetBlock == null) {
+                    System.out.println("Frame built");
+                    frameBuilt = true;
+                    break;
+                }
+            }
+
+            if (targetBlock != null) {
+                this.world.setBlockState(targetBlock, Factory.FRAME_BLOCK.getDefaultState());
+                targetBlock = getNextFramePos(targetBlock);
+            }
+        }
+
+        private BlockPos getNextFramePos(BlockPos currentPos) {
+            assert this.world != null;
+            switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
+                case NORTH:
+                    //Starts minX - minX > maxX - minZ < maxZ
+                    if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ + 1))
+                        return null;
+                    if (targetBlock.getX() > maxX && targetBlock.getZ() == minZ)
+                        return currentPos.add(-1, 0, 0);
+                    if (targetBlock.getX() == maxX && targetBlock.getZ() < maxZ)
+                        return currentPos.add(0, 0, 1);
+                    if (targetBlock.getZ() == maxZ && targetBlock.getX() < minX)
+                        return currentPos.add(1, 0, 0);
+                    if (targetBlock.getX() == minX && targetBlock.getZ() > minZ)
+                        return currentPos.add(0, 0, -1);
+
+                case EAST:
+                    //Starts minZ - minX > maxX - minZ > maxZ
+                    if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX - 1))
+                        return null;
+                    if (targetBlock.getZ() > maxZ && targetBlock.getX() == minX)
+                        return currentPos.add(0, 0, -1);
+                    if (targetBlock.getZ() == maxZ && targetBlock.getX() > maxX)
+                        return currentPos.add(-1, 0, 0);
+                    if (targetBlock.getX() == maxX && targetBlock.getZ() < minZ)
+                        return currentPos.add(0, 0, 1);
+                    if (targetBlock.getZ() == minZ && targetBlock.getX() < minX)
+                        return currentPos.add(1, 0, 0);
+
+                case SOUTH:
+                    //Starts minX - minX < maxX - minZ > maxZ
+                    if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ - 1))
+                        return null;
+                    if (targetBlock.getX() < maxX && targetBlock.getZ() == minZ)
+                        return currentPos.add(1, 0, 0);
+                    if (targetBlock.getX() == maxX && targetBlock.getZ() > maxZ)
+                        return currentPos.add(0, 0, -1);
+                    if (targetBlock.getZ() == maxZ && targetBlock.getX() > minX)
+                        return currentPos.add(-1, 0, 0);
+                    if (targetBlock.getX() == minX && targetBlock.getZ() < minZ)
+                        return currentPos.add(0, 0, 1);
+
+                case WEST:
+                    //Starts minZ - minX < maxX - minZ < maxZ
+                    if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX + 1))
+                        return null;
+                    if (targetBlock.getZ() < maxZ && targetBlock.getX() == minX)
+                        return currentPos.add(0, 0, 1);
+                    if (targetBlock.getZ() == maxZ && targetBlock.getX() < maxX)
+                        return currentPos.add(1, 0, 0);
+                    if (targetBlock.getX() == maxX && targetBlock.getZ() > minZ)
+                        return currentPos.add(0, 0, -1);
+                    if (targetBlock.getZ() == minZ && targetBlock.getX() > minX)
+                        return currentPos.add(-1, 0, 0);
+            }
+            return null;
+        }
+    }
+
     private enum DiggingDirection {
         NORTH, EAST, SOUTH, WEST
     }
 
     private DefaultedList<ItemStack> inventory;
     protected int viewerCount;
+    private int delay = 20;
+    private boolean frameBuilt = false;
+    private boolean active = true;
     private BlockPos targetBlock;
     private DiggingDirection diggingDirection;
     private int minX;
@@ -272,47 +367,98 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
     public void tick() {
         if (world != null) {
             if (targetBlock == null) {
-                switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
-                    case NORTH:
-                        targetBlock = this.pos.add(7, 14, 2);
-                        diggingDirection = DiggingDirection.WEST;
-                        minX = targetBlock.getX();
-                        minZ = targetBlock.getZ();
-                        maxX = minX - 14;
-                        maxZ = minZ + 14;
-                        break;
-
-                    case EAST:
-                        targetBlock = pos.add(-2, 14, 7);
-                        diggingDirection = DiggingDirection.NORTH;
-                        minX = targetBlock.getX();
-                        minZ = targetBlock.getZ();
-                        maxX = minX - 14;
-                        maxZ = minZ - 14;
-                        break;
-
-                    case SOUTH:
-                        targetBlock = pos.add(-7, 14, -2);
-                        diggingDirection = DiggingDirection.EAST;
-                        minX = targetBlock.getX();
-                        minZ = targetBlock.getZ();
-                        maxX = minX + 14;
-                        maxZ = minZ - 14;
-                        break;
-
-                    case WEST:
-                        targetBlock = pos.add(2, 14, -7);
-                        diggingDirection = DiggingDirection.SOUTH;
-                        minX = targetBlock.getX();
-                        minZ = targetBlock.getZ();
-                        maxX = minX + 14;
-                        maxZ = minZ + 14;
-                        break;
+                if (!frameBuilt) {
+                    getFrameStart();
+                } else {
+                    getDiggingStart();
                 }
             } else {
-                DigBlockTask digBlockTask = new DigBlockTask(this.getWorld(), this.getPos());
-                digBlockTask.runTask();
+                if (active) {
+                    if (!frameBuilt) {
+                        BuildFrameTask buildFrameTask = new BuildFrameTask(this.getWorld(), this.getPos());
+                        buildFrameTask.runTask();
+                    } else {
+                        DigBlockTask digBlockTask = new DigBlockTask(this.getWorld(), this.getPos());
+                        digBlockTask.runTask();
+                    }
+                }
             }
+        }
+    }
+
+    private void getFrameStart() {
+        switch (this.world.getBlockState(this.getPos()).get(QuarryBlock.FACING)) {
+            case NORTH:
+                targetBlock = this.getPos().add(8, 0, 1);
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX - 16;
+                maxZ = minZ + 16;
+                break;
+
+            case EAST:
+                targetBlock = this.getPos().add(-1, 0, 8);
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX - 16;
+                maxZ = minZ - 16;
+                break;
+
+            case SOUTH:
+                targetBlock = this.getPos().add(-8, 0, -1);
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX + 16;
+                maxZ = minZ - 16;
+                break;
+
+            case WEST:
+                targetBlock = this.getPos().add(1, 0, -8);
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX + 16;
+                maxZ = minZ + 16;
+                break;
+        }
+    }
+
+    private void getDiggingStart() {
+        switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
+            case NORTH:
+                targetBlock = this.pos.add(7, 14, 2);
+                diggingDirection = DiggingDirection.WEST;
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX - 14;
+                maxZ = minZ + 14;
+                break;
+
+            case EAST:
+                targetBlock = pos.add(-2, 14, 7);
+                diggingDirection = DiggingDirection.NORTH;
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX - 14;
+                maxZ = minZ - 14;
+                break;
+
+            case SOUTH:
+                targetBlock = pos.add(-7, 14, -2);
+                diggingDirection = DiggingDirection.EAST;
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX + 14;
+                maxZ = minZ - 14;
+                break;
+
+            case WEST:
+                targetBlock = pos.add(2, 14, -7);
+                diggingDirection = DiggingDirection.SOUTH;
+                minX = targetBlock.getX();
+                minZ = targetBlock.getZ();
+                maxX = minX + 14;
+                maxZ = minZ + 14;
+                break;
         }
     }
 

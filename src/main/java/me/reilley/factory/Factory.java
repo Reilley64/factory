@@ -1,5 +1,6 @@
 package me.reilley.factory;
 
+import me.reilley.factory.blocks.quarry.FrameBlock;
 import me.reilley.factory.blocks.generator.GeneratorBlock;
 import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
 import me.reilley.factory.blocks.quarry.QuarryBlock;
@@ -22,14 +23,14 @@ public class Factory implements ModInitializer {
 
     public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.build(
             new Identifier(MOD_ID, "general"),
-            () -> new ItemStack(Blocks.COBBLESTONE)
+            () -> new ItemStack(Factory.QUARRY)
     );
 
     public static final Block QUARRY = new QuarryBlock();
     public static final Identifier QUARRY_IDENTIFIER = new Identifier(MOD_ID, "quarry");
     public static BlockEntityType<QuarryBlockEntity> QUARRY_ENTITY_TYPE;
 
-    public static final Block FRAME_BLOCK = new QuarryBlock();
+    public static final Block FRAME_BLOCK = new FrameBlock();
     public static final Identifier FRAME_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "frame_block");
 
     public static final Block GENERATOR = new GeneratorBlock();
