@@ -9,8 +9,6 @@ import net.minecraft.block.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
-import net.minecraft.fluid.LavaFluid;
-import net.minecraft.fluid.WaterFluid;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -33,8 +31,8 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
     private abstract static class Task {
         private int energyRequired;
 
-        public Task(int energyRequired) {
-            energyRequired = energyRequired;
+        Task(int energyRequired) {
+            this.energyRequired = energyRequired;
         }
 
         public abstract void runTask();
@@ -44,7 +42,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         private final World world;
         private final BlockPos pos;
 
-        public DigBlockTask(World world, BlockPos pos) {
+        DigBlockTask(World world, BlockPos pos) {
             super(20);
             this.world = world;
             this.pos = pos;
@@ -178,7 +176,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
         private final World world;
         private final BlockPos pos;
 
-        public BuildFrameTask(World world, BlockPos pos) {
+        BuildFrameTask(World world, BlockPos pos) {
             super(10);
             this.world = world;
             this.pos = pos;
@@ -265,7 +263,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
     }
 
     private DefaultedList<ItemStack> inventory;
-    protected int viewerCount;
+    private int viewerCount;
     private int delay = 20;
     private boolean frameBuilt = false;
     private boolean active = true;
@@ -355,7 +353,8 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
 
     }
 
-    protected void onInvOpenOrClose() {
+    private void onInvOpenOrClose() {
+        assert this.world != null;
         Block block = this.getCachedState().getBlock();
         if (block instanceof QuarryBlock) {
             this.world.addSyncedBlockEvent(this.pos, block, 1, this.viewerCount);
@@ -387,6 +386,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
     }
 
     private void getFrameStart() {
+        assert this.world != null;
         switch (this.world.getBlockState(this.getPos()).get(QuarryBlock.FACING)) {
             case NORTH:
                 targetBlock = this.getPos().add(8, 0, 1);
@@ -423,6 +423,7 @@ public class QuarryBlockEntity extends LootableContainerBlockEntity implements T
     }
 
     private void getDiggingStart() {
+        assert this.world != null;
         switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
             case NORTH:
                 targetBlock = this.pos.add(7, 14, 2);
