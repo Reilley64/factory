@@ -26,7 +26,6 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,19 +162,19 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
     private void initializeDigging() {
         switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
             case NORTH:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(7, 14, 2), this.pos.add(-7, 0, 16), Direction.WEST);
+                this.diggingIterator = new RectangularPrismIterator(this.pos.add(7, 14, 2), new BlockPos(this.pos.getX() + -7, 0, this.pos.getZ() + 16), Direction.WEST);
                 break;
 
             case EAST:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-2, 14, 7), this.pos.add(-16, 0, -7), Direction.NORTH);
+                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-2, 14, 7), new BlockPos(this.pos.getX() + -16, 0, this.pos.getZ() + -7), Direction.NORTH);
                 break;
 
             case SOUTH:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-7, -1, -2), this.pos.add(7, 0, -16), Direction.EAST);
+                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-7, 14, -2), new BlockPos(this.pos.getX() + 7, 0, this.pos.getZ() + -16), Direction.EAST);
                 break;
 
             case WEST:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(2, 14, -7), this.pos.add(16, 0, 7), Direction.SOUTH);
+                this.diggingIterator = new RectangularPrismIterator(this.pos.add(2, 14, -7), new BlockPos(this.pos.getX() + 16, 0, this.pos.getZ() + 7), Direction.SOUTH);
                 break;
         }
     }
@@ -249,12 +248,12 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
             return;
         }
 
-        if (this.active && this.delay == 0 && this.world != null) {
+        if (this.active && this.delay == 0 && this.world != null && !this.world.isClient) {
             delay = 5;
 
             for (BlockPos blockPos : framePositions) {
                 if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
-                    BuildFrameTask buildFrameTask = new BuildFrameTask(this.pos);
+                    BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
                     buildFrameTask.run();
                     return;
                 }
