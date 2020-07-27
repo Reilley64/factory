@@ -30,13 +30,16 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
                 switch (currentDirection) {
                     case NORTH:
                         if (current.getZ() == max.getZ()) return Direction.WEST;
+                        break;
 
                     case SOUTH:
                         if (current.getZ() == min.getZ()) return Direction.WEST;
+                        break;
 
                     case WEST:
                         if (current.getZ() == min.getZ()) return Direction.NORTH;
-                        else if (current.getZ() == min.getZ()) return Direction.SOUTH;
+                        else if (current.getZ() == max.getZ()) return Direction.SOUTH;
+                        break;
                 }
                 break;
 
@@ -45,12 +48,15 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
                     case NORTH:
                         if (current.getX() == min.getX()) return Direction.EAST;
                         else if (current.getX() == max.getX()) return Direction.WEST;
+                        break;
 
                     case EAST:
                         if (current.getX() == max.getX()) return Direction.NORTH;
+                        break;
 
                     case WEST:
                         if (current.getX() == min.getX()) return Direction.NORTH;
+                        break;
                 }
                 break;
 
@@ -58,13 +64,16 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
                 switch (currentDirection) {
                     case NORTH:
                         if (current.getZ() == min.getZ()) return Direction.EAST;
+                        break;
 
                     case EAST:
                         if (current.getZ() == min.getZ()) return Direction.SOUTH;
                         else if (current.getZ() == max.getZ()) return Direction.NORTH;
+                        break;
 
                     case SOUTH:
                         if (current.getZ() == max.getZ()) return Direction.EAST;
+                        break;
                 }
                 break;
 
@@ -72,13 +81,16 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
                 switch (currentDirection) {
                     case EAST:
                         if (current.getX() == min.getX()) return Direction.SOUTH;
+                        break;
 
                     case SOUTH:
                         if (current.getX() == min.getX()) return Direction.WEST;
                         else if (current.getX() == max.getX()) return Direction.EAST;
+                        break;
 
                     case WEST:
                         if (current.getX() == max.getX()) return Direction.SOUTH;
+                        break;
                 }
                 break;
         }
@@ -135,7 +147,7 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
         currentDirection = getNextDirection();
 
         if (current.getX() == max.getX() && current.getZ() == max.getZ()) {
-            if (current.getY() - 1 >= 0) current = null;
+            if (current.getY() - 1 < 0) current = null;
             else current = new BlockPos(min.getX(), current.getY() - 1, min.getZ());
         } else {
             switch (currentDirection) {

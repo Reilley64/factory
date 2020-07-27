@@ -7,8 +7,6 @@ import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
@@ -28,7 +26,6 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -41,12 +38,6 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
     }
 
     private class DigBlockTask extends Task {
-        private final World world;
-
-        DigBlockTask(World world) {
-            this.world = world;
-        }
-
         @Override
         public int getEnergyRequired() {
             return 20;
@@ -55,26 +46,29 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
         @Override
         public void runTask() {
             while (diggingIterator.getCurrent() != null
-                    && (this.world.getBlockState(diggingIterator.getCurrent()).getBlock() instanceof AirBlock
-                    || this.world.getBlockState(diggingIterator.getCurrent()).getHardness(this.world, diggingIterator.getCurrent()) < 0.0F
-                    || !(this.world.getBlockState(diggingIterator.getCurrent().add(0, 1, 0)).getBlock() instanceof AirBlock)
-                    || (!(this.world.getBlockState(diggingIterator.getCurrent()).getFluidState().getFluid() instanceof EmptyFluid)
-                    && !this.world.getBlockState(diggingIterator.getCurrent()).getFluidState().isStill()))) {
+                    && (world.getBlockState(diggingIterator.getCurrent()).getBlock() instanceof AirBlock
+                    || world.getBlockState(diggingIterator.getCurrent()).getHardness(world, diggingIterator.getCurrent()) < 0.0F
+                    || !(world.getBlockState(diggingIterator.getCurrent().add(0, 1, 0)).getBlock() instanceof AirBlock)
+                    || (!(world.getBlockState(diggingIterator.getCurrent()).getFluidState().getFluid() instanceof EmptyFluid)
+                    && !world.getBlockState(diggingIterator.getCurrent()).getFluidState().isStill()))) {
+                System.out.println(1);
                 diggingIterator.next();
             }
 
+            System.out.println(2);
+
             if (diggingIterator.getCurrent() == null) active = false;
             else {
-                if (!this.world.isClient) {
-                    BlockEntity blockEntity = this.world.getBlockEntity(diggingIterator.getCurrent());
-                    LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).random(this.world.random).parameter(LootContextParameters.POSITION, diggingIterator.getCurrent()).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
-                    List<ItemStack> droppedItems = this.world.getBlockState(diggingIterator.getCurrent()).getDroppedStacks(builder);
+                if (!world.isClient) {
+                    BlockEntity blockEntity = world.getBlockEntity(diggingIterator.getCurrent());
+                    LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).random(world.random).parameter(LootContextParameters.POSITION, diggingIterator.getCurrent()).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
+                    List<ItemStack> droppedItems = world.getBlockState(diggingIterator.getCurrent()).getDroppedStacks(builder);
                     if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
                         for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-                        if (!(this.world.getBlockState(diggingIterator.getCurrent()).getFluidState().getFluid() instanceof EmptyFluid)) {
-                            this.world.setBlockState(diggingIterator.getCurrent(), Blocks.COBBLESTONE.getDefaultState());
-                            this.world.removeBlock(diggingIterator.getCurrent(), false);
-                        } else this.world.breakBlock(diggingIterator.getCurrent(), false);
+                        if (!(world.getBlockState(diggingIterator.getCurrent()).getFluidState().getFluid() instanceof EmptyFluid)) {
+                            world.setBlockState(diggingIterator.getCurrent(), Blocks.COBBLESTONE.getDefaultState());
+                            world.removeBlock(diggingIterator.getCurrent(), false);
+                        } else world.breakBlock(diggingIterator.getCurrent(), false);
                     }
                 }
             }
@@ -168,6 +162,7 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
     }
 
     private boolean active = true;
+    private int delay = 20;
     private boolean frameBuilt = false;
     private BlockPos targetBlock;
     private int minX;
@@ -255,7 +250,7 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
                 break;
 
             case SOUTH:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-7, 14, -2), this.pos.add(7, 0, -16), Direction.EAST);
+                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-7, -1, -2), this.pos.add(7, 0, -16), Direction.EAST);
                 break;
 
             case WEST:
@@ -266,7 +261,8 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
 
     @Override
     public void tick() {
-        if (this.active && this.world != null) {
+        this.delay -= 1;
+        if (this.active && this.delay == 0 && this.world != null) {
             if (!this.frameBuilt) {
                 if (this.targetBlock == null) initializeFrameBuild();
                 else {
@@ -276,10 +272,11 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
             } else  {
                 if (this.diggingIterator == null) initializeDigging();
                 else {
-                    DigBlockTask digBlockTask = new DigBlockTask(this.world);
+                    DigBlockTask digBlockTask = new DigBlockTask();
                     digBlockTask.runTask();
                 }
             }
+            this.delay = 5;
         }
     }
 }
