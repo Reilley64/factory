@@ -104,7 +104,7 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
         BlockPos nextPos = currentPos;
 
         if (currentPos.getX() == maxPos.getX() && currentPos.getZ() == maxPos.getZ()) {
-            return nextPos.getY() - 1 >= 0;
+            return nextPos.getY() - 1 < 0;
         } else {
             switch (nextDirection) {
                 case NORTH:

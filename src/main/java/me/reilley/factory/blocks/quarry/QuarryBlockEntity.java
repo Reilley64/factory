@@ -28,59 +28,46 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements NamedScreenHandlerFactory, Tickable {
     private abstract static class Task {
         public abstract int getEnergyRequired();
 
-        public abstract void runTask();
+        public abstract void run();
     }
 
     private class DigBlockTask extends Task {
+        private final BlockPos pos;
+
+        public DigBlockTask(BlockPos pos) {
+            this.pos = pos;
+        }
+
         @Override
         public int getEnergyRequired() {
             return 20;
         }
 
         @Override
-        public void runTask() {
-            while (diggingIterator.getCurrentPos() != null
-                    && (world.getBlockState(diggingIterator.getCurrentPos()).getBlock() instanceof AirBlock
-                    || world.getBlockState(diggingIterator.getCurrentPos()).getHardness(world, diggingIterator.getCurrentPos()) < 0.0F
-                    || !(world.getBlockState(diggingIterator.getCurrentPos().add(0, 1, 0)).getBlock() instanceof AirBlock)
-                    || (!(world.getBlockState(diggingIterator.getCurrentPos()).getFluidState().getFluid() instanceof EmptyFluid)
-                    && !world.getBlockState(diggingIterator.getCurrentPos()).getFluidState().isStill()))) {
-                System.out.println(1);
-                diggingIterator.next();
-            }
-
-            System.out.println(2);
-
-            if (diggingIterator.getCurrentPos() == null) active = false;
-            else {
-                if (!world.isClient) {
-                    BlockEntity blockEntity = world.getBlockEntity(diggingIterator.getCurrentPos());
-                    LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).random(world.random).parameter(LootContextParameters.POSITION, diggingIterator.getCurrentPos()).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
-                    List<ItemStack> droppedItems = world.getBlockState(diggingIterator.getCurrentPos()).getDroppedStacks(builder);
-                    if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
-                        for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-                        if (!(world.getBlockState(diggingIterator.getCurrentPos()).getFluidState().getFluid() instanceof EmptyFluid)) {
-                            world.setBlockState(diggingIterator.getCurrentPos(), Blocks.COBBLESTONE.getDefaultState());
-                            world.removeBlock(diggingIterator.getCurrentPos(), false);
-                        } else world.breakBlock(diggingIterator.getCurrentPos(), false);
-                    }
-                }
+        public void run() {
+            LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).random(world.random).parameter(LootContextParameters.POSITION, this.pos).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, world.getBlockEntity(this.pos));
+            List<ItemStack> droppedItems = world.getBlockState(this.pos).getDroppedStacks(builder);
+            if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
+                for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
+                if (!(world.getBlockState(this.pos).getFluidState().getFluid() instanceof EmptyFluid)) {
+                    world.setBlockState(this.pos, Blocks.COBBLESTONE.getDefaultState());
+                    world.removeBlock(this.pos, false);
+                } else world.breakBlock(this.pos, false);
             }
         }
     }
 
     private class BuildFrameTask extends Task {
-        private final World world;
         private final BlockPos pos;
 
-        BuildFrameTask(World world, BlockPos pos) {
-            this.world = world;
+        BuildFrameTask(BlockPos pos) {
             this.pos = pos;
         }
 
@@ -90,85 +77,19 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
         }
 
         @Override
-        public void runTask() {
-            while (this.world.getBlockState(targetBlock).getBlock() instanceof FrameBlock) {
-                targetBlock = getNextFramePos(targetBlock);
-                if (targetBlock == null) {
-                    System.out.println("Frame built");
-                    frameBuilt = true;
-                    break;
-                }
-            }
-
-            if (targetBlock != null) {
-                this.world.setBlockState(targetBlock, Factory.FRAME_BLOCK.getDefaultState());
-                targetBlock = getNextFramePos(targetBlock);
-            }
-        }
-
-        private BlockPos getNextFramePos(BlockPos currentPos) {
-            assert this.world != null;
-            switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
-                case NORTH:
-                    if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ + 1))
-                        return null;
-                    if (targetBlock.getX() > maxX && targetBlock.getZ() == minZ)
-                        return currentPos.add(-1, 0, 0);
-                    if (targetBlock.getX() == maxX && targetBlock.getZ() < maxZ)
-                        return currentPos.add(0, 0, 1);
-                    if (targetBlock.getZ() == maxZ && targetBlock.getX() < minX)
-                        return currentPos.add(1, 0, 0);
-                    if (targetBlock.getX() == minX && targetBlock.getZ() > minZ)
-                        return currentPos.add(0, 0, -1);
-
-                case EAST:
-                    if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX - 1))
-                        return null;
-                    if (targetBlock.getZ() > maxZ && targetBlock.getX() == minX)
-                        return currentPos.add(0, 0, -1);
-                    if (targetBlock.getZ() == maxZ && targetBlock.getX() > maxX)
-                        return currentPos.add(-1, 0, 0);
-                    if (targetBlock.getX() == maxX && targetBlock.getZ() < minZ)
-                        return currentPos.add(0, 0, 1);
-                    if (targetBlock.getZ() == minZ && targetBlock.getX() < minX)
-                        return currentPos.add(1, 0, 0);
-
-                case SOUTH:
-                    if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ - 1))
-                        return null;
-                    if (targetBlock.getX() < maxX && targetBlock.getZ() == minZ)
-                        return currentPos.add(1, 0, 0);
-                    if (targetBlock.getX() == maxX && targetBlock.getZ() > maxZ)
-                        return currentPos.add(0, 0, -1);
-                    if (targetBlock.getZ() == maxZ && targetBlock.getX() > minX)
-                        return currentPos.add(-1, 0, 0);
-                    if (targetBlock.getX() == minX && targetBlock.getZ() < minZ)
-                        return currentPos.add(0, 0, 1);
-
-                case WEST:
-                    if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX + 1))
-                        return null;
-                    if (targetBlock.getZ() < maxZ && targetBlock.getX() == minX)
-                        return currentPos.add(0, 0, 1);
-                    if (targetBlock.getZ() == maxZ && targetBlock.getX() < maxX)
-                        return currentPos.add(1, 0, 0);
-                    if (targetBlock.getX() == maxX && targetBlock.getZ() > minZ)
-                        return currentPos.add(0, 0, -1);
-                    if (targetBlock.getZ() == minZ && targetBlock.getX() > minX)
-                        return currentPos.add(-1, 0, 0);
-            }
-            return null;
+        public void run() {
+            world.setBlockState(this.pos, Factory.FRAME_BLOCK.getDefaultState());
         }
     }
 
     private boolean active = true;
     private int delay = 20;
-    private boolean frameBuilt = false;
     private BlockPos targetBlock;
     private int minX;
     private int minZ;
     private int maxX;
     private int maxZ;
+    private final List<BlockPos> framePositions = new ArrayList<>();
     private RectangularPrismIterator diggingIterator;
 
     public QuarryBlockEntity() {
@@ -259,24 +180,100 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
         }
     }
 
+    private BlockPos getNextFramePos(BlockPos currentPos) {
+        assert this.world != null;
+        switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
+            case NORTH:
+                if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ + 1))
+                    return null;
+                if (targetBlock.getX() > maxX && targetBlock.getZ() == minZ)
+                    return currentPos.add(-1, 0, 0);
+                if (targetBlock.getX() == maxX && targetBlock.getZ() < maxZ)
+                    return currentPos.add(0, 0, 1);
+                if (targetBlock.getZ() == maxZ && targetBlock.getX() < minX)
+                    return currentPos.add(1, 0, 0);
+                if (targetBlock.getX() == minX && targetBlock.getZ() > minZ)
+                    return currentPos.add(0, 0, -1);
+
+            case EAST:
+                if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX - 1))
+                    return null;
+                if (targetBlock.getZ() > maxZ && targetBlock.getX() == minX)
+                    return currentPos.add(0, 0, -1);
+                if (targetBlock.getZ() == maxZ && targetBlock.getX() > maxX)
+                    return currentPos.add(-1, 0, 0);
+                if (targetBlock.getX() == maxX && targetBlock.getZ() < minZ)
+                    return currentPos.add(0, 0, 1);
+                if (targetBlock.getZ() == minZ && targetBlock.getX() < minX)
+                    return currentPos.add(1, 0, 0);
+
+            case SOUTH:
+                if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ - 1))
+                    return null;
+                if (targetBlock.getX() < maxX && targetBlock.getZ() == minZ)
+                    return currentPos.add(1, 0, 0);
+                if (targetBlock.getX() == maxX && targetBlock.getZ() > maxZ)
+                    return currentPos.add(0, 0, -1);
+                if (targetBlock.getZ() == maxZ && targetBlock.getX() > minX)
+                    return currentPos.add(-1, 0, 0);
+                if (targetBlock.getX() == minX && targetBlock.getZ() < minZ)
+                    return currentPos.add(0, 0, 1);
+
+            case WEST:
+                if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX + 1))
+                    return null;
+                if (targetBlock.getZ() < maxZ && targetBlock.getX() == minX)
+                    return currentPos.add(0, 0, 1);
+                if (targetBlock.getZ() == maxZ && targetBlock.getX() < maxX)
+                    return currentPos.add(1, 0, 0);
+                if (targetBlock.getX() == maxX && targetBlock.getZ() > minZ)
+                    return currentPos.add(0, 0, -1);
+                if (targetBlock.getZ() == minZ && targetBlock.getX() > minX)
+                    return currentPos.add(-1, 0, 0);
+        }
+        return null;
+    }
+
     @Override
     public void tick() {
         this.delay -= 1;
+        if (this.targetBlock == null) initializeFrameBuild();
+        if (this.diggingIterator == null) initializeDigging();
+
+        if (framePositions.size() != 64) {
+            framePositions.add(targetBlock);
+            while (getNextFramePos(targetBlock) != null) {
+                framePositions.add(getNextFramePos(targetBlock));
+                targetBlock = getNextFramePos(targetBlock);
+            }
+            return;
+        }
+
         if (this.active && this.delay == 0 && this.world != null) {
-            if (!this.frameBuilt) {
-                if (this.targetBlock == null) initializeFrameBuild();
-                else {
-                    BuildFrameTask buildFrameTask = new BuildFrameTask(this.world, this.pos);
-                    buildFrameTask.runTask();
-                }
-            } else  {
-                if (this.diggingIterator == null) initializeDigging();
-                else {
-                    DigBlockTask digBlockTask = new DigBlockTask();
-                    digBlockTask.runTask();
+            delay = 5;
+
+            for (BlockPos blockPos : framePositions) {
+                if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
+                    BuildFrameTask buildFrameTask = new BuildFrameTask(this.pos);
+                    buildFrameTask.run();
+                    return;
                 }
             }
-            this.delay = 5;
+
+            while (diggingIterator.hasNext()) {
+                BlockPos blockPos = diggingIterator.next();
+                if (!(world.getBlockState(blockPos).getBlock() instanceof AirBlock
+                        || world.getBlockState(blockPos).getHardness(world, blockPos) < 0.0F
+                        || !(world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
+                        || (!(world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
+                        && !world.getBlockState(blockPos).getFluidState().isStill()))) {
+                    DigBlockTask digBlockTask = new DigBlockTask(blockPos);
+                    digBlockTask.run();
+                    return;
+                }
+            }
+
+            this.active = false;
         }
     }
 }
