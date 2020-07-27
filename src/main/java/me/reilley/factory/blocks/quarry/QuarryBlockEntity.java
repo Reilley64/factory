@@ -45,30 +45,30 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
 
         @Override
         public void runTask() {
-            while (diggingIterator.getCurrent() != null
-                    && (world.getBlockState(diggingIterator.getCurrent()).getBlock() instanceof AirBlock
-                    || world.getBlockState(diggingIterator.getCurrent()).getHardness(world, diggingIterator.getCurrent()) < 0.0F
-                    || !(world.getBlockState(diggingIterator.getCurrent().add(0, 1, 0)).getBlock() instanceof AirBlock)
-                    || (!(world.getBlockState(diggingIterator.getCurrent()).getFluidState().getFluid() instanceof EmptyFluid)
-                    && !world.getBlockState(diggingIterator.getCurrent()).getFluidState().isStill()))) {
+            while (diggingIterator.getCurrentPos() != null
+                    && (world.getBlockState(diggingIterator.getCurrentPos()).getBlock() instanceof AirBlock
+                    || world.getBlockState(diggingIterator.getCurrentPos()).getHardness(world, diggingIterator.getCurrentPos()) < 0.0F
+                    || !(world.getBlockState(diggingIterator.getCurrentPos().add(0, 1, 0)).getBlock() instanceof AirBlock)
+                    || (!(world.getBlockState(diggingIterator.getCurrentPos()).getFluidState().getFluid() instanceof EmptyFluid)
+                    && !world.getBlockState(diggingIterator.getCurrentPos()).getFluidState().isStill()))) {
                 System.out.println(1);
                 diggingIterator.next();
             }
 
             System.out.println(2);
 
-            if (diggingIterator.getCurrent() == null) active = false;
+            if (diggingIterator.getCurrentPos() == null) active = false;
             else {
                 if (!world.isClient) {
-                    BlockEntity blockEntity = world.getBlockEntity(diggingIterator.getCurrent());
-                    LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).random(world.random).parameter(LootContextParameters.POSITION, diggingIterator.getCurrent()).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
-                    List<ItemStack> droppedItems = world.getBlockState(diggingIterator.getCurrent()).getDroppedStacks(builder);
+                    BlockEntity blockEntity = world.getBlockEntity(diggingIterator.getCurrentPos());
+                    LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).random(world.random).parameter(LootContextParameters.POSITION, diggingIterator.getCurrentPos()).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
+                    List<ItemStack> droppedItems = world.getBlockState(diggingIterator.getCurrentPos()).getDroppedStacks(builder);
                     if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
                         for (ItemStack itemStack : droppedItems) addItemStackToInventory(inventory, itemStack);
-                        if (!(world.getBlockState(diggingIterator.getCurrent()).getFluidState().getFluid() instanceof EmptyFluid)) {
-                            world.setBlockState(diggingIterator.getCurrent(), Blocks.COBBLESTONE.getDefaultState());
-                            world.removeBlock(diggingIterator.getCurrent(), false);
-                        } else world.breakBlock(diggingIterator.getCurrent(), false);
+                        if (!(world.getBlockState(diggingIterator.getCurrentPos()).getFluidState().getFluid() instanceof EmptyFluid)) {
+                            world.setBlockState(diggingIterator.getCurrentPos(), Blocks.COBBLESTONE.getDefaultState());
+                            world.removeBlock(diggingIterator.getCurrentPos(), false);
+                        } else world.breakBlock(diggingIterator.getCurrentPos(), false);
                     }
                 }
             }
