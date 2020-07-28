@@ -5,11 +5,13 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
@@ -65,23 +67,17 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-//        if (world.isClient) {
-//            return ActionResult.SUCCESS;
-//        } else {
-//            world.playSound(
-//                    null,
-//                    pos,
-//                    Factory.HELLO_EVENT,
-//                    SoundCategory.BLOCKS,
-//                    1f,
-//                    1f
-//            );
-//            player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
-//            return ActionResult.CONSUME;
-//        }
-        NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
-        player.openHandledScreen(namedScreenHandlerFactory);
-        return ActionResult.SUCCESS;
+        if (world.isClient) {
+            return ActionResult.SUCCESS;
+        } else {
+            world.playSound(null, pos, Factory.HELLO_EVENT, SoundCategory.BLOCKS, 1f, 1f);
+            NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
+            if (namedScreenHandlerFactory != null) {
+                player.openHandledScreen(namedScreenHandlerFactory);
+                PiglinBrain.onGuardedBlockBroken(player, true);
+            }
+            return ActionResult.CONSUME;
+        }
     }
 
     @Override
