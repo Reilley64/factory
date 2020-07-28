@@ -6,7 +6,6 @@ import me.reilley.factory.misc.RectangularPrismIterator;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
@@ -16,9 +15,9 @@ import net.minecraft.item.Items;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -111,16 +110,12 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
 
     @Override
     public Text getDisplayName() {
-        return new TranslatableText("factory.quarry");
-    }
-
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this);
+        return new TranslatableText(getCachedState().getBlock().getTranslationKey());
     }
 
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        return this.createScreenHandler(syncId, inv);
+    public ScreenHandler createMenu(int syncId, PlayerInventory inventory, PlayerEntity player) {
+        return new QuarryBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
     }
 
     private void initializeFrameBuild() {
@@ -239,19 +234,19 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
         if (this.targetBlock == null) initializeFrameBuild();
         if (this.diggingIterator == null) initializeDigging();
 
-        if (framePositions.size() != 64) {
-            framePositions.add(targetBlock);
-            while (getNextFramePos(targetBlock) != null) {
-                framePositions.add(getNextFramePos(targetBlock));
-                targetBlock = getNextFramePos(targetBlock);
+        if (this.framePositions.size() != 64) {
+            this.framePositions.add(this.targetBlock);
+            while (getNextFramePos(this.targetBlock) != null) {
+                this.framePositions.add(getNextFramePos(this.targetBlock));
+                this.targetBlock = getNextFramePos(this.targetBlock);
             }
             return;
         }
 
         if (this.active && this.delay == 0 && this.world != null && !this.world.isClient) {
-            delay = 5;
+            this.delay = 5;
 
-            for (BlockPos blockPos : framePositions) {
+            for (BlockPos blockPos : this.framePositions) {
                 if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
                     BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
                     buildFrameTask.run();
@@ -259,13 +254,13 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
                 }
             }
 
-            while (diggingIterator.hasNext()) {
-                BlockPos blockPos = diggingIterator.next();
-                if (!(world.getBlockState(blockPos).getBlock() instanceof AirBlock
-                        || world.getBlockState(blockPos).getHardness(world, blockPos) < 0.0F
-                        || !(world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
-                        || (!(world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
-                        && !world.getBlockState(blockPos).getFluidState().isStill()))) {
+            while (this.diggingIterator.hasNext()) {
+                BlockPos blockPos = this.diggingIterator.next();
+                if (!(this.world.getBlockState(blockPos).getBlock() instanceof AirBlock
+                        || this.world.getBlockState(blockPos).getHardness(this.world, blockPos) < 0.0F
+                        || !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
+                        || (!(this.world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
+                        && !this.world.getBlockState(blockPos).getFluidState().isStill()))) {
                     DigBlockTask digBlockTask = new DigBlockTask(blockPos);
                     digBlockTask.run();
                     return;

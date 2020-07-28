@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "me.reilley.factory.Factory"
+    ],
+    "client": [
+      "me.reilley.factory.FactoryClient"
     ]
   },
   "depends": {

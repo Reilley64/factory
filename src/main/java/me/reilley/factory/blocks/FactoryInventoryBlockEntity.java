@@ -6,19 +6,35 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Direction;
 
 import java.util.List;
 
-public abstract class FactoryInventoryBlockEntity extends BlockEntity implements Inventory {
-    public DefaultedList<ItemStack> inventory;
+public abstract class FactoryInventoryBlockEntity extends BlockEntity implements SidedInventory {
+    protected DefaultedList<ItemStack> inventory;
     private int viewerCount;
 
     public FactoryInventoryBlockEntity(BlockEntityType<?> type, int size) {
         super(type);
         this.inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+    }
+
+    @Override
+    public int[] getAvailableSlots(Direction side) {
+        return new int[inventory.size()];
+    }
+
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, Direction dir) {
+        return true;
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return true;
     }
 
     @Override

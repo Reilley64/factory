@@ -5,25 +5,27 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
-public class QuarryBlock extends BlockWithEntity {
+public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
+    public static final Identifier ID = new Identifier(Factory.MOD_ID, "quarry");
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public QuarryBlock() {
@@ -63,25 +65,23 @@ public class QuarryBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient) {
-            return ActionResult.SUCCESS;
-        } else {
-            world.playSound(
-                    null,
-                    pos,
-                    Factory.HELLO_EVENT,
-                    SoundCategory.BLOCKS,
-                    1f,
-                    1f
-            );
-            NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
-            if (namedScreenHandlerFactory != null) {
-                player.openHandledScreen(namedScreenHandlerFactory);
-                PiglinBrain.onGuardedBlockBroken(player, true);
-            }
-
-            return ActionResult.CONSUME;
-        }
+//        if (world.isClient) {
+//            return ActionResult.SUCCESS;
+//        } else {
+//            world.playSound(
+//                    null,
+//                    pos,
+//                    Factory.HELLO_EVENT,
+//                    SoundCategory.BLOCKS,
+//                    1f,
+//                    1f
+//            );
+//            player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+//            return ActionResult.CONSUME;
+//        }
+        NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
+        player.openHandledScreen(namedScreenHandlerFactory);
+        return ActionResult.SUCCESS;
     }
 
     @Override
@@ -94,5 +94,10 @@ public class QuarryBlock extends BlockWithEntity {
             }
             super.onStateReplaced(state, world, pos, newState, moved);
         }
+    }
+
+    @Override
+    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+        return ((QuarryBlockEntity) world.getBlockEntity(pos));
     }
 }
