@@ -2,6 +2,7 @@ package me.reilley.factory.blocks.quarry;
 
 import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.FactoryInventoryBlockEntity;
+import me.reilley.factory.blocks.frame.FrameBlock;
 import me.reilley.factory.misc.RectangularPrismIterator;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
