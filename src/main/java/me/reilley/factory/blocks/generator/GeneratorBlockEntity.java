@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 public class GeneratorBlockEntity extends FactoryInventoryBlockEntity implements NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private int energy = 0;
     private int burnTime = 0;
+    private int fuelTime = 0;
 
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
@@ -30,6 +31,9 @@ public class GeneratorBlockEntity extends FactoryInventoryBlockEntity implements
 
                 case 1:
                     return burnTime;
+
+                case 2:
+                    return fuelTime;
             }
 
             return -1;
@@ -45,12 +49,16 @@ public class GeneratorBlockEntity extends FactoryInventoryBlockEntity implements
                 case 1:
                     burnTime = value;
                     break;
+
+                case 2:
+                    fuelTime = value;
+                    break;
             }
         }
 
         @Override
         public int size() {
-            return 2;
+            return 3;
         }
     };
 
@@ -108,7 +116,8 @@ public class GeneratorBlockEntity extends FactoryInventoryBlockEntity implements
     @Override
     public void tick() {
         if (burnTime == 0 && !inventory.get(0).isEmpty()) {
-            burnTime += AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
+            fuelTime = AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
+            burnTime = AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
             inventory.get(0).decrement(1);
         } else if (burnTime > 0) {
             burnTime--;
