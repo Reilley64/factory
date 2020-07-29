@@ -32,7 +32,7 @@ public class GeneratorBlock extends BlockWithEntity implements InventoryProvider
     public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 
     public GeneratorBlock() {
-        super(FabricBlockSettings.of(Material.METAL).strength(5, 6).lightLevel(value -> value.get(GeneratorBlock.ACTIVE) ? 13 : 0));
+        super(FabricBlockSettings.of(Material.METAL).strength(5, 6).lightLevel(blockState -> blockState.get(GeneratorBlock.ACTIVE) ? 13 : 0));
         this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE,false));
     }
 
