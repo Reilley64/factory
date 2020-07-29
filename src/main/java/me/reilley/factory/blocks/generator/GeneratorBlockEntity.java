@@ -116,12 +116,16 @@ public class GeneratorBlockEntity extends FactoryInventoryBlockEntity implements
     @Override
     public void tick() {
         if (burnTime == 0 && !inventory.get(0).isEmpty()) {
+            ((GeneratorBlock) this.world.getBlockState(this.pos).getBlock()).setActive(true, this.world, this.pos);
             fuelTime = AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
             burnTime = AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
             inventory.get(0).decrement(1);
         } else if (burnTime > 0) {
             burnTime--;
             energy += 2;
+            if (burnTime == 0) {
+                ((GeneratorBlock) this.world.getBlockState(this.pos).getBlock()).setActive(false, this.world, this.pos);
+            }
         }
     }
 }

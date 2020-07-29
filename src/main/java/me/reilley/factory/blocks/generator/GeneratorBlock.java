@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
@@ -27,10 +28,11 @@ import net.minecraft.world.WorldAccess;
 public class GeneratorBlock extends BlockWithEntity implements InventoryProvider {
     public static final Identifier ID = new Identifier(Factory.MOD_ID, "generator");
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static BooleanProperty ACTIVE;
 
     public GeneratorBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
-        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE,false));
     }
 
     public Direction getFacing(BlockState state) {
@@ -41,6 +43,12 @@ public class GeneratorBlock extends BlockWithEntity implements InventoryProvider
         world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
     }
 
+    public void setActive(Boolean active, World world, BlockPos pos) {
+        Direction facing = world.getBlockState(pos).get(FACING);
+        BlockState state = world.getBlockState(pos).with(ACTIVE, active).with(FACING, facing);
+        world.setBlockState(pos, state, 3);
+    }
+
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.onPlaced(world, pos, state, placer, stack);
@@ -49,9 +57,11 @@ public class GeneratorBlock extends BlockWithEntity implements InventoryProvider
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        ACTIVE = BooleanProperty.of("active");
         FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
-        builder.add(FACING);
+        builder.add(ACTIVE, FACING);
     }
+
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
