@@ -93,7 +93,6 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
     private int maxX;
     private int maxZ;
     private final List<BlockPos> framePositions = new ArrayList<>();
-    private RectangularPrismIterator diggingIterator;
 
     public QuarryBlockEntity() {
         super(Factory.QUARRY_ENTITY_TYPE, 27);

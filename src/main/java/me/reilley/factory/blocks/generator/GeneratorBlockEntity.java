@@ -5,6 +5,7 @@ import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.FactoryInventoryBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
