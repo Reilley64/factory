@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
@@ -15,13 +16,16 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
-public class GeneratorBlock extends BlockWithEntity {
+public class GeneratorBlock extends BlockWithEntity implements InventoryProvider {
+    public static final Identifier ID = new Identifier(Factory.MOD_ID, "generator");
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public GeneratorBlock() {
@@ -80,5 +84,10 @@ public class GeneratorBlock extends BlockWithEntity {
 
             return ActionResult.CONSUME;
         }
+    }
+
+    @Override
+    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+        return ((GeneratorBlockEntity) world.getBlockEntity(pos));
     }
 }

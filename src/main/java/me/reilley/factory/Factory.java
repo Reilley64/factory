@@ -1,6 +1,7 @@
 package me.reilley.factory;
 
 import me.reilley.factory.blocks.frame.FrameBlock;
+import me.reilley.factory.blocks.generator.GeneratorBlockGuiDescription;
 import me.reilley.factory.blocks.quarry.*;
 import me.reilley.factory.blocks.generator.GeneratorBlock;
 import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
@@ -35,10 +36,10 @@ public class Factory implements ModInitializer {
     public static final Identifier FRAME_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "frame_block");
 
     public static final Block GENERATOR = new GeneratorBlock();
-    public static final Identifier GENERATOR_IDENTIFIER = new Identifier(MOD_ID, "generator");
     public static BlockEntityType<GeneratorBlockEntity> GENERATOR_ENTITY_TYPE;
+    public static ScreenHandlerType<GeneratorBlockGuiDescription> GENERATOR_SCREEN_HANDLER_TYPE;
 
-    public static final Identifier HELLO_ID = new Identifier("factory:hello");
+    public static final Identifier HELLO_ID = new Identifier(MOD_ID, "hello");
     public static SoundEvent HELLO_EVENT = new SoundEvent(HELLO_ID);
 
     @Override
@@ -51,9 +52,10 @@ public class Factory implements ModInitializer {
         Registry.register(Registry.BLOCK, FRAME_BLOCK_IDENTIFIER, FRAME_BLOCK);
         Registry.register(Registry.ITEM, FRAME_BLOCK_IDENTIFIER, new BlockItem(FRAME_BLOCK, new Item.Settings().group(ITEM_GROUP)));
 
-        Registry.register(Registry.BLOCK, GENERATOR_IDENTIFIER, GENERATOR);
-        Registry.register(Registry.ITEM, GENERATOR_IDENTIFIER, new BlockItem(GENERATOR, new Item.Settings().group(ITEM_GROUP)));
-        GENERATOR_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, GENERATOR_IDENTIFIER, BlockEntityType.Builder.create(GeneratorBlockEntity::new, GENERATOR).build(null));
+        Registry.register(Registry.BLOCK, GeneratorBlock.ID, GENERATOR);
+        Registry.register(Registry.ITEM, GeneratorBlock.ID, new BlockItem(GENERATOR, new Item.Settings().group(ITEM_GROUP)));
+        GENERATOR_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, GeneratorBlock.ID, BlockEntityType.Builder.create(GeneratorBlockEntity::new, GENERATOR).build(null));
+        GENERATOR_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(GeneratorBlock.ID, (syncId, inventory) -> new GeneratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
 
         Registry.register(Registry.SOUND_EVENT, Factory.HELLO_ID, HELLO_EVENT);
     }

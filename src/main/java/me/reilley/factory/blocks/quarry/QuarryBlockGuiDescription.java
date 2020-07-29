@@ -23,8 +23,7 @@ public class QuarryBlockGuiDescription extends SyncedGuiDescription {
         Iterator<Integer> iterator = slots.iterator();
         for (int y = 0; y < blockInventory.size() / 9; y++) {
             for (int x = 0; x < 9; x++) {
-                WItemSlot itemSlot = WItemSlot.of(blockInventory, iterator.next());
-                root.add(itemSlot, x, y + 1);
+                root.add(WItemSlot.of(blockInventory, iterator.next()), x, y + 1);
             }
         }
 

@@ -22,7 +22,7 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
 
     @Override
     public boolean hasNext() {
-        return currentPos != maxPos;
+        return !(currentPos.getX() == maxPos.getX() && currentPos.getY() == maxPos.getY() && currentPos.getZ() == maxPos.getZ());
     }
 
     @Override

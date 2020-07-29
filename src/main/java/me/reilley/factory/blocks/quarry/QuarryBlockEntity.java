@@ -3,10 +3,12 @@ package me.reilley.factory.blocks.quarry;
 import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.FactoryInventoryBlockEntity;
 import me.reilley.factory.blocks.frame.FrameBlock;
+import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
 import me.reilley.factory.misc.RectangularPrismIterator;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
@@ -51,6 +53,7 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
 
         @Override
         public void run() {
+            energy -= getEnergyRequired();
             LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).random(world.random).parameter(LootContextParameters.POSITION, this.pos).parameter(LootContextParameters.TOOL, new ItemStack(Items.DIAMOND_PICKAXE)).optionalParameter(LootContextParameters.BLOCK_ENTITY, world.getBlockEntity(this.pos));
             List<ItemStack> droppedItems = world.getBlockState(this.pos).getDroppedStacks(builder);
             if (canItemStacksBeAddedToInventory(inventory, droppedItems)) {
@@ -77,12 +80,13 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
 
         @Override
         public void run() {
+            energy -= getEnergyRequired();
             world.setBlockState(this.pos, Factory.FRAME_BLOCK.getDefaultState());
         }
     }
 
     private boolean active = true;
-    private int delay = 20;
+    private int energy;
     private BlockPos targetBlock;
     private int minX;
     private int minZ;
@@ -155,24 +159,22 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
         }
     }
 
-    private void initializeDigging() {
+    private RectangularPrismIterator initializeDigging() {
         switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
             case NORTH:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(7, 14, 2), new BlockPos(this.pos.getX() + -7, 0, this.pos.getZ() + 16), Direction.WEST);
-                break;
+                return new RectangularPrismIterator(this.pos.add(7, 14, 2), new BlockPos(this.pos.getX() + -7, 0, this.pos.getZ() + 16), Direction.WEST);
 
             case EAST:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-2, 14, 7), new BlockPos(this.pos.getX() + -16, 0, this.pos.getZ() + -7), Direction.NORTH);
-                break;
+                return new RectangularPrismIterator(this.pos.add(-2, 14, 7), new BlockPos(this.pos.getX() + -16, 0, this.pos.getZ() + -7), Direction.NORTH);
 
             case SOUTH:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(-7, 14, -2), new BlockPos(this.pos.getX() + 7, 0, this.pos.getZ() + -16), Direction.EAST);
-                break;
+                return new RectangularPrismIterator(this.pos.add(-7, 14, -2), new BlockPos(this.pos.getX() + 7, 0, this.pos.getZ() + -16), Direction.EAST);
 
             case WEST:
-                this.diggingIterator = new RectangularPrismIterator(this.pos.add(2, 14, -7), new BlockPos(this.pos.getX() + 16, 0, this.pos.getZ() + 7), Direction.SOUTH);
-                break;
+                return new RectangularPrismIterator(this.pos.add(2, 14, -7), new BlockPos(this.pos.getX() + 16, 0, this.pos.getZ() + 7), Direction.SOUTH);
         }
+
+        return null;
     }
 
     private BlockPos getNextFramePos(BlockPos currentPos) {
@@ -231,9 +233,7 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
 
     @Override
     public void tick() {
-        this.delay -= 1;
         if (this.targetBlock == null) initializeFrameBuild();
-        if (this.diggingIterator == null) initializeDigging();
 
         if (this.framePositions.size() != 64) {
             this.framePositions.add(this.targetBlock);
@@ -244,26 +244,39 @@ public class QuarryBlockEntity extends FactoryInventoryBlockEntity implements Na
             return;
         }
 
-        if (this.active && this.delay == 0 && this.world != null && !this.world.isClient) {
-            this.delay = 5;
+        for (Direction side : Direction.values()) {
+            BlockEntity blockEntity = getWorld().getBlockEntity(getPos().offset(side));
+            if (blockEntity instanceof GeneratorBlockEntity) {
+                GeneratorBlockEntity generatorBlockEntity = (GeneratorBlockEntity) blockEntity;
+                if (generatorBlockEntity.getEnergy() > 5) {
+                    this.energy += 5;
+                    generatorBlockEntity.setEnergy(generatorBlockEntity.getEnergy() - 5);
+                } else {
+                    this.energy += generatorBlockEntity.getEnergy();
+                    generatorBlockEntity.setEnergy(0);
+                }
+            }
+        }
 
+        if (this.active && this.world != null && !this.world.isClient) {
             for (BlockPos blockPos : this.framePositions) {
                 if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
                     BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
-                    buildFrameTask.run();
+                    if (energy >= buildFrameTask.getEnergyRequired()) buildFrameTask.run();
                     return;
                 }
             }
 
-            while (this.diggingIterator.hasNext()) {
-                BlockPos blockPos = this.diggingIterator.next();
+            RectangularPrismIterator rectangularPrismIterator = initializeDigging();
+            while (rectangularPrismIterator.hasNext()) {
+                BlockPos blockPos = rectangularPrismIterator.next();
                 if (!(this.world.getBlockState(blockPos).getBlock() instanceof AirBlock
                         || this.world.getBlockState(blockPos).getHardness(this.world, blockPos) < 0.0F
                         || !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
                         || (!(this.world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
                         && !this.world.getBlockState(blockPos).getFluidState().isStill()))) {
                     DigBlockTask digBlockTask = new DigBlockTask(blockPos);
-                    digBlockTask.run();
+                    if (energy >= digBlockTask.getEnergyRequired()) digBlockTask.run();
                     return;
                 }
             }

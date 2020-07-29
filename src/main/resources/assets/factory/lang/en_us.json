@@ -1,7 +1,12 @@
 {
   "itemGroup.factory.general": "Factory Mod",
-  "item.factory.quarry": "Quarry",
-  "block.factory.quarry": "Quarry",
+
+  "block.factory.frame_block": "Frame Block",
   "item.factory.frame_block": "Frame Block",
-  "block.factory.frame_block": "Frame Block"
+
+  "block.factory.generator": "Generator",
+  "item.factory.generator": "Generator",
+
+  "block.factory.quarry": "Quarry",
+  "item.factory.quarry": "Quarry"
 }
