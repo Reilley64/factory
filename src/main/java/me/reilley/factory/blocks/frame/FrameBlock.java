@@ -1,6 +1,7 @@
 package me.reilley.factory.blocks.frame;
 
 import me.reilley.factory.Factory;
+import me.reilley.factory.blocks.quarry.QuarryBlock;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
@@ -79,7 +80,7 @@ public class FrameBlock extends Block {
 
     private Boolean canConnectTo(WorldAccess world, BlockPos pos, Direction facing) {
         Block block = world.getBlockState(pos).getBlock();
-        if (block != null && block instanceof FrameBlock) {
+        if (block != null && (block instanceof FrameBlock || block instanceof QuarryBlock)) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;

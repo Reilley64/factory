@@ -28,6 +28,23 @@
     {
       "when": { "down": "true" },
       "apply": { "model": "factory:block/frame/frame_side", "x": 90 }
+    },
+
+    {
+      "when": { "north": "true", "east": "true" },
+      "apply": { "model": "factory:block/frame/frame_side", "x": 90 }
+    },
+    {
+      "when": { "south": "true", "east": "true" },
+      "apply": { "model": "factory:block/frame/frame_side", "x": 90 }
+    },
+    {
+      "when": { "north": "true", "west": "true" },
+      "apply": { "model": "factory:block/frame/frame_side", "x": 90 }
+    },
+    {
+      "when": { "south": "true", "west": "true" },
+      "apply": { "model": "factory:block/frame/frame_side", "x": 90 }
     }
   ]
 }
