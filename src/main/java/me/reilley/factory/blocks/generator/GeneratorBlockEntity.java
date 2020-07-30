@@ -24,7 +24,7 @@ import net.minecraft.util.math.Direction;
 public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
-    private int energy = 0;
+    private double energy = 0;
     private int burnTime = 0;
     private int fuelTime = 0;
 
@@ -33,7 +33,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
         public int get(int index) {
             switch (index) {
                 case 0:
-                    return energy;
+                    return (int) energy;
 
                 case 1:
                     return burnTime;
@@ -94,33 +94,28 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
     }
 
     @Override
-    public int getEnergy() {
+    public double getEnergy() {
         return energy;
     }
 
     @Override
-    public void setEnergy(int value) {
-        this.energy = value;
+    public void setEnergy(double energy) {
+        this.energy = energy;
     }
 
     @Override
-    public int getMaxPowerInput() {
+    public double getEnergyCapacity() {
+        return 1000;
+    }
+
+    @Override
+    public double getMaxEnergyInput() {
         return 0;
     }
 
     @Override
-    public int getMaxPowerOutput() {
+    public double getMaxEnergyOutput() {
         return 1;
-    }
-
-    @Override
-    public boolean canInsertPower() {
-        return false;
-    }
-
-    @Override
-    public boolean canExtractPower() {
-        return true;
     }
 
     @Override
@@ -193,23 +188,30 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
     @Override
     public void tick() {
-        if (burnTime == 0 && !inventory.get(0).isEmpty()) {
-            GeneratorBlock.setActive(true, this.world, this.pos);
-            fuelTime = AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
-            burnTime = fuelTime;
-            inventory.get(0).decrement(1);
-        } else if (burnTime > 0) {
-            burnTime--;
-            energy += 1;
-            if (burnTime == 0) GeneratorBlock.setActive(false, this.world, this.pos);
-        }
+        if (!this.world.isClient) {
+            if (burnTime == 0 && !inventory.get(0).isEmpty()) {
+                GeneratorBlock.setActive(true, this.world, this.pos);
+                fuelTime = AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(inventory.get(0).getItem(), 0);
+                burnTime = fuelTime;
+                inventory.get(0).decrement(1);
+            } else if (burnTime > 0) {
+                if (energy != getEnergyCapacity()) energy += 1;
+                burnTime--;
+                if (burnTime == 0) GeneratorBlock.setActive(false, this.world, this.pos);
+            }
 
-        for (Direction side : Direction.values()) {
-            BlockEntity blockEntity = getWorld().getBlockEntity(this.pos.offset(side));
-            if (blockEntity instanceof FactoryEnergy) {
-                FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
-                if (factoryEnergyBlockEntity.canInsertPower())
-                    factoryEnergyBlockEntity.insertPower(extractPower(Math.min(getMaxPowerOutput(), factoryEnergyBlockEntity.getMaxPowerInput())));
+            for (Direction side : Direction.values()) {
+                BlockEntity blockEntity = getWorld().getBlockEntity(this.pos.offset(side));
+                if (blockEntity instanceof FactoryEnergy) {
+                    FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
+                    if (factoryEnergyBlockEntity.getMaxEnergyInput() > 0)
+                        factoryEnergyBlockEntity.insertEnergy(extractEnergy(
+                                Math.min(
+                                        Math.min(getMaxEnergyOutput(), factoryEnergyBlockEntity.getMaxEnergyInput()),
+                                        factoryEnergyBlockEntity.getEnergyCapacity() - factoryEnergyBlockEntity.getEnergy()
+                                )
+                        ));
+                }
             }
         }
     }
