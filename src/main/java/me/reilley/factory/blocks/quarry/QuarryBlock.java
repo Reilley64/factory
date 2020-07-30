@@ -73,6 +73,8 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        System.out.println(String.format("%s %s", pos.toString(), ((QuarryBlockEntity) world.getBlockEntity(pos)).getEnergy()));
+
         if (world.isClient) {
             return ActionResult.SUCCESS;
         } else {

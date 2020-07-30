@@ -1,17 +1,23 @@
 package me.reilley.factory.misc;
 
 public interface FactoryEnergy {
-    int getEnergy();
+    double getEnergy();
 
-    void setEnergy(int value);
+    void setEnergy(double energy);
 
-    default int extract(int amount) {
-        int minAmount = Math.min(amount, getEnergy());
+    double getEnergyCapacity();
+
+    double getMaxEnergyInput();
+
+    double getMaxEnergyOutput();
+
+    default double extractEnergy(double energy) {
+        double minAmount = Math.min(energy, getEnergy());
         setEnergy(getEnergy() - minAmount);
         return minAmount;
     }
 
-    default void insert(int amount) {
-        setEnergy(getEnergy() + amount);
+    default void insertEnergy(double energy) {
+        setEnergy(getEnergy() + energy);
     }
 }

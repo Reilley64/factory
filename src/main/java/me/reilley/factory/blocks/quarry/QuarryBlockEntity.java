@@ -2,7 +2,6 @@ package me.reilley.factory.blocks.quarry;
 
 import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.frame.FrameBlock;
-import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;
 import me.reilley.factory.misc.RectangularPrismIterator;
@@ -35,7 +34,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
     private final List<BlockPos> framePositions = new ArrayList<>();
     private DefaultedList<ItemStack> inventory;
     private boolean active = true;
-    private int energy;
+    private double energy;
     private int viewerCount;
     // TODO: remove these for frame iterator
     private BlockPos targetBlock;
@@ -64,13 +63,28 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
     }
 
     @Override
-    public int getEnergy() {
+    public double getEnergy() {
         return energy;
     }
 
     @Override
-    public void setEnergy(int value) {
-        this.energy = value;
+    public void setEnergy(double energy) {
+        this.energy = energy;
+    }
+
+    @Override
+    public double getEnergyCapacity() {
+        return 100;
+    }
+
+    @Override
+    public double getMaxEnergyInput() {
+        return active ? 1 : 0;
+    }
+
+    @Override
+    public double getMaxEnergyOutput() {
+        return 0;
     }
 
     @Override
@@ -127,49 +141,43 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
     @Override
     public void tick() {
-        if (this.targetBlock == null) initializeFrameBuild();
+        if (!this.world.isClient) {
+            if (this.targetBlock == null) initializeFrameBuild();
 
-        if (this.framePositions.size() != 64) {
-            this.framePositions.add(this.targetBlock);
-            while (getNextFramePos(this.targetBlock) != null) {
-                this.framePositions.add(getNextFramePos(this.targetBlock));
-                this.targetBlock = getNextFramePos(this.targetBlock);
-            }
-            return;
-        }
-
-        for (Direction side : Direction.values()) {
-            BlockEntity blockEntity = getWorld().getBlockEntity(getPos().offset(side));
-            if (blockEntity instanceof GeneratorBlockEntity) {
-                GeneratorBlockEntity generatorBlockEntity = (GeneratorBlockEntity) blockEntity;
-                insert(generatorBlockEntity.extract(5));
-            }
-        }
-
-        if (this.active && this.world != null && !this.world.isClient) {
-            for (BlockPos blockPos : this.framePositions) {
-                if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
-                    BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
-                    if (energy >= buildFrameTask.getEnergyRequired()) buildFrameTask.run();
-                    return;
+            if (this.framePositions.size() != 64) {
+                this.framePositions.add(this.targetBlock);
+                while (getNextFramePos(this.targetBlock) != null) {
+                    this.framePositions.add(getNextFramePos(this.targetBlock));
+                    this.targetBlock = getNextFramePos(this.targetBlock);
                 }
+                return;
             }
 
-            RectangularPrismIterator rectangularPrismIterator = initializeDigging();
-            while (rectangularPrismIterator.hasNext()) {
-                BlockPos blockPos = rectangularPrismIterator.next();
-                if (!(this.world.getBlockState(blockPos).getBlock() instanceof AirBlock
-                        || this.world.getBlockState(blockPos).getHardness(this.world, blockPos) < 0.0F
-                        || !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
-                        || (!(this.world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
-                        && !this.world.getBlockState(blockPos).getFluidState().isStill()))) {
-                    DigBlockTask digBlockTask = new DigBlockTask(blockPos);
-                    if (energy >= digBlockTask.getEnergyRequired()) digBlockTask.run();
-                    return;
+            if (this.active && this.world != null) {
+                for (BlockPos blockPos : this.framePositions) {
+                    if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
+                        BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
+                        if (energy >= buildFrameTask.getEnergyRequired()) buildFrameTask.run();
+                        return;
+                    }
                 }
-            }
 
-            this.active = false;
+                RectangularPrismIterator rectangularPrismIterator = initializeDigging();
+                while (rectangularPrismIterator.hasNext()) {
+                    BlockPos blockPos = rectangularPrismIterator.next();
+                    if (!(this.world.getBlockState(blockPos).getBlock() instanceof AirBlock
+                            || this.world.getBlockState(blockPos).getHardness(this.world, blockPos) < 0.0F
+                            || !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
+                            || (!(this.world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
+                            && !this.world.getBlockState(blockPos).getFluidState().isStill()))) {
+                        DigBlockTask digBlockTask = new DigBlockTask(blockPos);
+                        if (energy >= digBlockTask.getEnergyRequired()) digBlockTask.run();
+                        return;
+                    }
+                }
+
+                this.active = false;
+            }
         }
     }
 

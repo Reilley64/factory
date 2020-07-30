@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public final class FrameShapeUtil {
-
     private final FrameBlock frameBlock;
     private final HashMap<BlockState, VoxelShape> shapes;
 
@@ -47,5 +46,4 @@ public final class FrameShapeUtil {
     public VoxelShape getShape(BlockState state) {
         return shapes.get(state);
     }
-
 }
