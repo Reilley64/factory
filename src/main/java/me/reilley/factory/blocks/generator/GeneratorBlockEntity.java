@@ -104,6 +104,26 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
     }
 
     @Override
+    public int getMaxPowerInput() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxPowerOutput() {
+        return 1;
+    }
+
+    @Override
+    public boolean canInsertPower() {
+        return false;
+    }
+
+    @Override
+    public boolean canExtractPower() {
+        return true;
+    }
+
+    @Override
     public PropertyDelegate getPropertyDelegate() {
         return propertyDelegate;
     }
@@ -182,6 +202,15 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
             burnTime--;
             energy += 1;
             if (burnTime == 0) GeneratorBlock.setActive(false, this.world, this.pos);
+        }
+
+        for (Direction side : Direction.values()) {
+            BlockEntity blockEntity = getWorld().getBlockEntity(this.pos.offset(side));
+            if (blockEntity instanceof FactoryEnergy) {
+                FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
+                if (factoryEnergyBlockEntity.canInsertPower())
+                    factoryEnergyBlockEntity.insertPower(extractPower(Math.min(getMaxPowerOutput(), factoryEnergyBlockEntity.getMaxPowerInput())));
+            }
         }
     }
 }

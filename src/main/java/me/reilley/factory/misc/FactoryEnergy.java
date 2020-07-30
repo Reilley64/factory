@@ -5,13 +5,25 @@ public interface FactoryEnergy {
 
     void setEnergy(int value);
 
-    default int extract(int amount) {
+    int getMaxPowerInput();
+
+    int getMaxPowerOutput();
+
+    default int extractPower(int amount) {
         int minAmount = Math.min(amount, getEnergy());
         setEnergy(getEnergy() - minAmount);
         return minAmount;
     }
 
-    default void insert(int amount) {
+    default void insertPower(int amount) {
         setEnergy(getEnergy() + amount);
+    }
+
+    default boolean canInsertPower() {
+        return false;
+    }
+
+    default boolean canExtractPower() {
+        return false;
     }
 }

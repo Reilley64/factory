@@ -74,6 +74,26 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
     }
 
     @Override
+    public int getMaxPowerInput() {
+        return 1;
+    }
+
+    @Override
+    public int getMaxPowerOutput() {
+        return 0;
+    }
+
+    @Override
+    public boolean canInsertPower() {
+        return true;
+    }
+
+    @Override
+    public boolean canExtractPower() {
+        return false;
+    }
+
+    @Override
     public Text getDisplayName() {
         return new TranslatableText(getCachedState().getBlock().getTranslationKey());
     }
@@ -136,14 +156,6 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
                 this.targetBlock = getNextFramePos(this.targetBlock);
             }
             return;
-        }
-
-        for (Direction side : Direction.values()) {
-            BlockEntity blockEntity = getWorld().getBlockEntity(getPos().offset(side));
-            if (blockEntity instanceof GeneratorBlockEntity) {
-                GeneratorBlockEntity generatorBlockEntity = (GeneratorBlockEntity) blockEntity;
-                insert(generatorBlockEntity.extract(5));
-            }
         }
 
         if (this.active && this.world != null && !this.world.isClient) {
