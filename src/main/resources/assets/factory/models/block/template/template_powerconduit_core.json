@@ -1,0 +1,20 @@
+{
+  "textures": {
+    "particle": "#powerconduit"
+  },
+  "elements": [
+    {
+      "from": [6, 6, 6],
+      "to": [10, 10, 10],
+      "shade": true,
+      "faces": {
+        "north": {"uv": [1, 1, 5, 5], "texture": "#powerconduit"},
+        "east": {"uv": [1, 1, 5, 5], "texture": "#powerconduit"},
+        "south": {"uv": [1, 1, 5, 5], "texture": "#powerconduit"},
+        "west": {"uv": [1, 1, 5, 5], "texture": "#powerconduit"},
+        "up": {"uv": [1, 1, 5, 5], "texture": "#powerconduit"},
+        "down": {"uv": [1, 1, 5, 5], "texture": "#powerconduit"}
+      }
+    }
+  ]
+}

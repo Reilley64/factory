@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PowerConduitBlock extends BlockWithEntity {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "power_conduit");
+    public static final Identifier ID = new Identifier(Factory.MOD_ID, "powerconduit");
 
     public static final BooleanProperty EAST = BooleanProperty.of("east");
     public static final BooleanProperty WEST = BooleanProperty.of("west");
@@ -86,8 +86,7 @@ public class PowerConduitBlock extends BlockWithEntity {
     }
 
     private Boolean canConnectTo(WorldAccess world, BlockPos pos, Direction facing) {
-        Block block = world.getBlockState(pos).getBlock();
-        if (block instanceof FactoryEnergy) {
+        if (world.getBlockEntity(pos) instanceof FactoryEnergy) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;

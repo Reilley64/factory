@@ -1,0 +1,6 @@
+{
+  "parent": "factory:block/template/template_powerconduit_side",
+  "textures": {
+    "powerconduit": "factory:block/powerconduit"
+  }
+}
