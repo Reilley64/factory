@@ -80,13 +80,12 @@ public class FrameBlock extends Block {
 
     private Boolean canConnectTo(WorldAccess world, BlockPos pos, Direction facing) {
         Block block = world.getBlockState(pos).getBlock();
-        if (block != null && (block instanceof FrameBlock || block instanceof QuarryBlock)) {
+        if (block instanceof FrameBlock || block instanceof QuarryBlock) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
     }
 
-    // BlockContainer
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
