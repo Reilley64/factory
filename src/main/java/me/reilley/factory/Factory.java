@@ -33,6 +33,7 @@ public class Factory implements ModInitializer {
     public static ScreenHandlerType<QuarryBlockGuiDescription> QUARRY_SCREEN_HANDLER_TYPE;
 
     public static final Block FRAME_BLOCK = new FrameBlock();
+    public static final Identifier FRAME_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "frame");
 
     public static final Block GENERATOR = new GeneratorBlock();
     public static BlockEntityType<GeneratorBlockEntity> GENERATOR_ENTITY_TYPE;

@@ -1,0 +1,6 @@
+{
+  "parent": "factory:block/template/template_frame_side",
+  "textures": {
+    "frame": "factory:block/frame"
+  }
+}
