@@ -33,7 +33,6 @@ public class Factory implements ModInitializer {
     public static ScreenHandlerType<QuarryBlockGuiDescription> QUARRY_SCREEN_HANDLER_TYPE;
 
     public static final Block FRAME_BLOCK = new FrameBlock();
-    public static final Identifier FRAME_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "frame_block");
 
     public static final Block GENERATOR = new GeneratorBlock();
     public static BlockEntityType<GeneratorBlockEntity> GENERATOR_ENTITY_TYPE;
@@ -46,16 +45,22 @@ public class Factory implements ModInitializer {
     public void onInitialize() {
         Registry.register(Registry.BLOCK, QuarryBlock.ID, QUARRY);
         Registry.register(Registry.ITEM, QuarryBlock.ID, new BlockItem(QUARRY, new Item.Settings().group(ITEM_GROUP)));
-        QUARRY_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, QuarryBlock.ID, BlockEntityType.Builder.create(QuarryBlockEntity::new, QUARRY).build(null));
-        QUARRY_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(QuarryBlock.ID, (syncId, inventory) -> new QuarryBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
+        QUARRY_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, QuarryBlock.ID,
+                BlockEntityType.Builder.create(QuarryBlockEntity::new, QUARRY).build(null));
+        QUARRY_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(QuarryBlock.ID,
+                (syncId, inventory) -> new QuarryBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
 
-        Registry.register(Registry.BLOCK, FRAME_BLOCK_IDENTIFIER, FRAME_BLOCK);
-        Registry.register(Registry.ITEM, FRAME_BLOCK_IDENTIFIER, new BlockItem(FRAME_BLOCK, new Item.Settings().group(ITEM_GROUP)));
+        Registry.register(Registry.BLOCK, FrameBlock.ID, FRAME_BLOCK);
+        Registry.register(Registry.ITEM, FrameBlock.ID, new BlockItem(FRAME_BLOCK,
+                new Item.Settings().group(ITEM_GROUP)));
 
         Registry.register(Registry.BLOCK, GeneratorBlock.ID, GENERATOR);
-        Registry.register(Registry.ITEM, GeneratorBlock.ID, new BlockItem(GENERATOR, new Item.Settings().group(ITEM_GROUP)));
-        GENERATOR_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, GeneratorBlock.ID, BlockEntityType.Builder.create(GeneratorBlockEntity::new, GENERATOR).build(null));
-        GENERATOR_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(GeneratorBlock.ID, (syncId, inventory) -> new GeneratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
+        Registry.register(Registry.ITEM, GeneratorBlock.ID, new BlockItem(GENERATOR,
+                new Item.Settings().group(ITEM_GROUP)));
+        GENERATOR_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, GeneratorBlock.ID,
+                BlockEntityType.Builder.create(GeneratorBlockEntity::new, GENERATOR).build(null));
+        GENERATOR_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(GeneratorBlock.ID,
+                (syncId, inventory) -> new GeneratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
 
         Registry.register(Registry.SOUND_EVENT, Factory.HELLO_ID, HELLO_EVENT);
     }

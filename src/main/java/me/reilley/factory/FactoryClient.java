@@ -14,7 +14,9 @@ public class FactoryClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ScreenRegistry.<QuarryBlockGuiDescription, QuarryBlockScreen>register(Factory.QUARRY_SCREEN_HANDLER_TYPE, (gui, inventory, title) -> new QuarryBlockScreen(gui, inventory.player, title));
-        ScreenRegistry.<GeneratorBlockGuiDescription, GeneratorBlockScreen>register(Factory.GENERATOR_SCREEN_HANDLER_TYPE, (gui, inventory, title) -> new GeneratorBlockScreen(gui, inventory.player, title));
+        ScreenRegistry.<QuarryBlockGuiDescription, QuarryBlockScreen>register(Factory.QUARRY_SCREEN_HANDLER_TYPE,
+                (gui, inventory, title) -> new QuarryBlockScreen(gui, inventory.player, title));
+        ScreenRegistry.<GeneratorBlockGuiDescription, GeneratorBlockScreen>register(Factory.GENERATOR_SCREEN_HANDLER_TYPE,
+                (gui, inventory, title) -> new GeneratorBlockScreen(gui, inventory.player, title));
     }
 }

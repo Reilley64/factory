@@ -14,8 +14,6 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -29,15 +27,11 @@ import net.minecraft.world.WorldAccess;
 
 public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
     public static final Identifier ID = new Identifier(Factory.MOD_ID, "quarry");
-    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
 
     public QuarryBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
         this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH));
-    }
-
-    public Direction getFacing(BlockState state) {
-        return state.get(FACING);
     }
 
     public void setFacing(Direction facing, World world, BlockPos pos) {
@@ -52,7 +46,6 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
         builder.add(FACING);
     }
 
@@ -67,6 +60,18 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
     }
 
     @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.isOf(newState.getBlock())) {
+            BlockEntity blockEntity = world.getBlockEntity(pos);
+            if (blockEntity instanceof Inventory) {
+                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
+                world.updateComparators(pos, this);
+            }
+            super.onStateReplaced(state, world, pos, newState, moved);
+        }
+    }
+
+    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.isClient) {
             return ActionResult.SUCCESS;
@@ -78,18 +83,6 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
                 PiglinBrain.onGuardedBlockBroken(player, true);
             }
             return ActionResult.CONSUME;
-        }
-    }
-
-    @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof Inventory) {
-                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-                world.updateComparators(pos, this);
-            }
-            super.onStateReplaced(state, world, pos, newState, moved);
         }
     }
 
