@@ -6,10 +6,7 @@ import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;
 import me.reilley.factory.misc.RectangularPrismIterator;
-import net.minecraft.block.AirBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -303,7 +300,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
         @Override
         public int getEnergyRequired() {
-            return 20;
+            return (int) (16 * (world.getBlockState(pos).getHardness(world, pos) * 2));
         }
 
         @Override
@@ -333,7 +330,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
         @Override
         public int getEnergyRequired() {
-            return 10;
+            return 24;
         }
 
         @Override

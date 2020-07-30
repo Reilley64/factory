@@ -180,7 +180,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
             inventory.get(0).decrement(1);
         } else if (burnTime > 0) {
             burnTime--;
-            energy += 2;
+            energy += 1;
             if (burnTime == 0) GeneratorBlock.setActive(false, this.world, this.pos);
         }
     }
