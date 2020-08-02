@@ -41,7 +41,7 @@ public class FrameBlock extends Block {
     private final FrameShapeUtil frameShapeUtil;
 
     public FrameBlock() {
-        super(FabricBlockSettings.of(Material.METAL).strength(-1.0F, 1000));
+        super(FabricBlockSettings.of(Material.METAL).strength(-1.0F, 1000).nonOpaque());
         setDefaultState(getStateManager().getDefaultState().with(EAST, false).with(WEST, false).with(NORTH, false)
                 .with(SOUTH, false).with(UP, false).with(DOWN, false));
         frameShapeUtil = new FrameShapeUtil(this);
