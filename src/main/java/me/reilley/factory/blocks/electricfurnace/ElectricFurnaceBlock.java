@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
 public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryProvider {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "electric_furnace");
+    public static final Identifier ID = new Identifier(Factory.MOD_ID, "electricfurnace");
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
 
     public ElectricFurnaceBlock() {

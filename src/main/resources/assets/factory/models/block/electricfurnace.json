@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "factory:block/electricfurnace_top",
+    "front": "factory:block/electricfurnace_unpowered",
+    "side": "factory:block/electricfurnace_side"
+  }
+}
