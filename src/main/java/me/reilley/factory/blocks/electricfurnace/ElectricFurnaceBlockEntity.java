@@ -212,6 +212,8 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                     this.cookTimeTotal = 0;
                 }
             }
+
+            ElectricFurnaceBlock.setActive(cookTimeTotal > 0, this.world, this.pos);
         }
     }
 

@@ -33,7 +33,6 @@ import java.util.List;
 public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, Tickable {
     private final List<BlockPos> framePositions = new ArrayList<>();
     private DefaultedList<ItemStack> inventory;
-    private boolean active = true;
     private double energy;
     private int viewerCount;
     // TODO: remove these for frame iterator
@@ -79,7 +78,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
     @Override
     public double getMaxEnergyInput() {
-        return active ? 1 : 0;
+        return this.world.getBlockState(this.pos).get(QuarryBlock.ACTIVE) ? 1 : 0;
     }
 
     @Override
@@ -153,7 +152,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
                 return;
             }
 
-            if (this.active && this.world != null) {
+            if (this.world.getBlockState(this.pos).get(QuarryBlock.ACTIVE)) {
                 for (BlockPos blockPos : this.framePositions) {
                     if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
                         BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
@@ -176,7 +175,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
                     }
                 }
 
-                this.active = false;
+                QuarryBlock.setActive(false, this.world, this.pos);
             }
         }
     }

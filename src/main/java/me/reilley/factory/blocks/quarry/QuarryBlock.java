@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -28,14 +29,19 @@ import net.minecraft.world.WorldAccess;
 public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
     public static final Identifier ID = new Identifier(Factory.MOD_ID, "quarry");
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
+    public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 
     public QuarryBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
-        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE, false));
     }
 
     public void setFacing(Direction facing, World world, BlockPos pos) {
         world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
+    }
+
+    public static void setActive(Boolean active, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(ACTIVE, active));
     }
 
     @Override
@@ -46,7 +52,7 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, ACTIVE);
     }
 
     @Override

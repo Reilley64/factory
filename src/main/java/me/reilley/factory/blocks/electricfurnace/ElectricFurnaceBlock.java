@@ -1,6 +1,7 @@
 package me.reilley.factory.blocks.electricfurnace;
 
 import me.reilley.factory.Factory;
+import me.reilley.factory.blocks.generator.GeneratorBlock;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -13,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -28,13 +30,20 @@ import net.minecraft.world.WorldAccess;
 public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryProvider {
     public static final Identifier ID = new Identifier(Factory.MOD_ID, "electricfurnace");
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
+    public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 
     public ElectricFurnaceBlock() {
-        super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
+        super(FabricBlockSettings.of(Material.METAL).strength(5, 6)
+                .lightLevel(blockState -> blockState.get(GeneratorBlock.ACTIVE) ? 13 : 0));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE,false));
     }
 
-    public void setFacing(Direction facing, World world, BlockPos pos) {
+    public static void setFacing(Direction facing, World world, BlockPos pos) {
         world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
+    }
+
+    public static void setActive(Boolean active, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(ACTIVE, active));
     }
 
     @Override
@@ -45,7 +54,7 @@ public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryPr
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, ACTIVE);
     }
 
     @Override
