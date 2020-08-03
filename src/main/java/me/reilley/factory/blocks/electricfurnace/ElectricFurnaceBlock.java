@@ -1,4 +1,4 @@
-package me.reilley.factory.blocks.quarry;
+package me.reilley.factory.blocks.electricfurnace;
 
 import me.reilley.factory.Factory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -25,13 +25,12 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "quarry");
+public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryProvider {
+    public static final Identifier ID = new Identifier(Factory.MOD_ID, "electric_furnace");
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
 
-    public QuarryBlock() {
+    public ElectricFurnaceBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
-        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH));
     }
 
     public void setFacing(Direction facing, World world, BlockPos pos) {
@@ -53,10 +52,9 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
-
     @Override
     public BlockEntity createBlockEntity(BlockView world) {
-        return new QuarryBlockEntity();
+        return new ElectricFurnaceBlockEntity();
     }
 
     @Override
@@ -73,9 +71,8 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient) {
-            return ActionResult.SUCCESS;
-        } else {
+        if (world.isClient) return ActionResult.SUCCESS;
+        else {
             world.playSound(null, pos, Factory.HELLO_EVENT, SoundCategory.BLOCKS, 1f, 1f);
             NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
             if (namedScreenHandlerFactory != null) {
@@ -88,6 +85,6 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
 
     @Override
     public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
-        return ((QuarryBlockEntity) world.getBlockEntity(pos));
+        return ((ElectricFurnaceBlockEntity) world.getBlockEntity(pos));
     }
 }

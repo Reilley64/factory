@@ -38,13 +38,13 @@ public class FrameBlock extends Block {
         map.put(Direction.DOWN, DOWN);
     });
 
-    private final FrameShapeUtil frameShapeUtil;
+    private final FrameBlockShapeUtil frameBlockShapeUtil;
 
     public FrameBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(-1.0F, 1000).nonOpaque());
         setDefaultState(getStateManager().getDefaultState().with(EAST, false).with(WEST, false).with(NORTH, false)
                 .with(SOUTH, false).with(UP, false).with(DOWN, false));
-        frameShapeUtil = new FrameShapeUtil(this);
+        frameBlockShapeUtil = new FrameBlockShapeUtil(this);
     }
 
     public BooleanProperty getProperty(Direction facing) {
@@ -110,6 +110,6 @@ public class FrameBlock extends Block {
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext shapeContext) {
-        return frameShapeUtil.getShape(state);
+        return frameBlockShapeUtil.getShape(state);
     }
 }

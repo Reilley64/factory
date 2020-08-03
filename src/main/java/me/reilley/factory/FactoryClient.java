@@ -1,5 +1,7 @@
 package me.reilley.factory;
 
+import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockGuiDescription;
+import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockScreen;
 import me.reilley.factory.blocks.generator.GeneratorBlockGuiDescription;
 import me.reilley.factory.blocks.generator.GeneratorBlockScreen;
 import me.reilley.factory.blocks.quarry.QuarryBlockGuiDescription;
@@ -21,5 +23,7 @@ public class FactoryClient implements ClientModInitializer {
                 (gui, inventory, title) -> new QuarryBlockScreen(gui, inventory.player, title));
         ScreenRegistry.<GeneratorBlockGuiDescription, GeneratorBlockScreen>register(Factory.GENERATOR_SCREEN_HANDLER_TYPE,
                 (gui, inventory, title) -> new GeneratorBlockScreen(gui, inventory.player, title));
+        ScreenRegistry.<ElectricFurnaceBlockGuiDescription, ElectricFurnaceBlockScreen>register(Factory.ELECTRIC_FURNACE_SCREEN_HANDLER_TYPE,
+                (gui, inventory, title) -> new ElectricFurnaceBlockScreen(gui, inventory.player, title));
     }
 }

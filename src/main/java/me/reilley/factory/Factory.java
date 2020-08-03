@@ -2,6 +2,9 @@ package me.reilley.factory;
 
 import me.reilley.factory.blocks.conduits.power.PowerConduitBlock;
 import me.reilley.factory.blocks.conduits.power.PowerConduitBlockEntity;
+import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlock;
+import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockEntity;
+import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockGuiDescription;
 import me.reilley.factory.blocks.frame.FrameBlock;
 import me.reilley.factory.blocks.generator.GeneratorBlockGuiDescription;
 import me.reilley.factory.blocks.quarry.*;
@@ -43,6 +46,10 @@ public class Factory implements ModInitializer {
     public static final Block POWER_CONDUIT_BLOCK = new PowerConduitBlock();
     public static BlockEntityType<PowerConduitBlockEntity> POWER_CONDUIT_ENTITY_TYPE;
 
+    private static final Block ELECTRIC_FURNACE = new ElectricFurnaceBlock();
+    public static BlockEntityType<ElectricFurnaceBlockEntity> ELECTRIC_FURNACE_ENTITY_TYPE;
+    public static ScreenHandlerType<ElectricFurnaceBlockGuiDescription> ELECTRIC_FURNACE_SCREEN_HANDLER_TYPE;
+
     public static final Identifier HELLO_ID = new Identifier(MOD_ID, "hello");
     public static SoundEvent HELLO_EVENT = new SoundEvent(HELLO_ID);
 
@@ -71,6 +78,13 @@ public class Factory implements ModInitializer {
         Registry.register(Registry.ITEM, PowerConduitBlock.ID, new BlockItem(POWER_CONDUIT_BLOCK, new Item.Settings().group(ITEM_GROUP)));
         POWER_CONDUIT_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, PowerConduitBlock.ID,
                 BlockEntityType.Builder.create(PowerConduitBlockEntity::new, POWER_CONDUIT_BLOCK).build(null));
+
+        Registry.register(Registry.BLOCK, ElectricFurnaceBlock.ID, ELECTRIC_FURNACE);
+        Registry.register(Registry.ITEM, ElectricFurnaceBlock.ID, new BlockItem(ELECTRIC_FURNACE, new Item.Settings().group(ITEM_GROUP)));
+        ELECTRIC_FURNACE_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, ElectricFurnaceBlock.ID,
+                BlockEntityType.Builder.create(ElectricFurnaceBlockEntity::new, ELECTRIC_FURNACE).build(null));
+        ELECTRIC_FURNACE_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(ElectricFurnaceBlock.ID,
+                (syncId, inventory) -> new ElectricFurnaceBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
 
         Registry.register(Registry.SOUND_EVENT, Factory.HELLO_ID, HELLO_EVENT);
     }

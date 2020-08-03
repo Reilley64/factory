@@ -1,5 +1,11 @@
 package me.reilley.factory.misc;
 
+import me.reilley.factory.blocks.conduits.power.PowerConduitBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
+
 public interface FactoryEnergy {
     double getEnergy();
 
@@ -19,5 +25,21 @@ public interface FactoryEnergy {
 
     default void insertEnergy(double energy) {
         setEnergy(getEnergy() + energy);
+    }
+
+    default void energyTick(World world, BlockPos pos) {
+        for (Direction side : Direction.values()) {
+            BlockEntity blockEntity = world.getBlockEntity(pos.offset(side));
+            if (blockEntity instanceof FactoryEnergy) {
+                FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
+                if (factoryEnergyBlockEntity.getMaxEnergyInput() > 0)
+                    factoryEnergyBlockEntity.insertEnergy(extractEnergy(
+                            Math.min(
+                                    Math.min(getMaxEnergyOutput(), factoryEnergyBlockEntity.getMaxEnergyInput()),
+                                    factoryEnergyBlockEntity.getEnergyCapacity() - factoryEnergyBlockEntity.getEnergy()
+                            )
+                    ));
+            }
+        }
     }
 }

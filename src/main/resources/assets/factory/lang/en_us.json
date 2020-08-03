@@ -1,8 +1,11 @@
 {
   "itemGroup.factory.general": "Factory Mod",
 
-  "block.factory.frame_block": "Frame Block",
-  "item.factory.frame_block": "Frame Block",
+  "block.factory.electric_furnace": "Electric Furnace",
+  "item.factory.electric_furnace": "Electric Furnace",
+
+  "block.factory.frame": "Frame",
+  "item.factory.frame": "Frame",
 
   "block.factory.generator": "Generator",
   "item.factory.generator": "Generator",

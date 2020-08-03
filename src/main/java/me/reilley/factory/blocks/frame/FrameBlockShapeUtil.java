@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public final class FrameShapeUtil {
+public final class FrameBlockShapeUtil {
     private final FrameBlock frameBlock;
     private final HashMap<BlockState, VoxelShape> shapes;
 
-    public FrameShapeUtil(FrameBlock frameBlock) {
+    public FrameBlockShapeUtil(FrameBlock frameBlock) {
         this.frameBlock = frameBlock;
         this.shapes = createStateShapeMap();
     }

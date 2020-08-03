@@ -200,19 +200,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
                 if (burnTime == 0) GeneratorBlock.setActive(false, this.world, this.pos);
             }
 
-            for (Direction side : Direction.values()) {
-                BlockEntity blockEntity = getWorld().getBlockEntity(this.pos.offset(side));
-                if (blockEntity instanceof FactoryEnergy) {
-                    FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
-                    if (factoryEnergyBlockEntity.getMaxEnergyInput() > 0)
-                        factoryEnergyBlockEntity.insertEnergy(extractEnergy(
-                                Math.min(
-                                        Math.min(getMaxEnergyOutput(), factoryEnergyBlockEntity.getMaxEnergyInput()),
-                                        factoryEnergyBlockEntity.getEnergyCapacity() - factoryEnergyBlockEntity.getEnergy()
-                                )
-                        ));
-                }
-            }
+            energyTick(this.world, this.pos);
         }
     }
 }
