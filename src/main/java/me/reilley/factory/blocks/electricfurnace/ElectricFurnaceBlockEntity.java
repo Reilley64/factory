@@ -24,6 +24,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Direction;
 
 public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private DefaultedList<ItemStack> inventory;
@@ -31,8 +32,6 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     private double energy = 0;
     private int cookTime = 0;
     private int cookTimeTotal = 0;
-    private ItemStack inputStack;
-
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
@@ -41,9 +40,12 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                     return (int) energy;
 
                 case 1:
-                    return cookTime;
+                    return (int) getEnergyCapacity();
 
                 case 2:
+                    return cookTime;
+
+                case 3:
                     return cookTimeTotal;
             }
 
@@ -58,10 +60,13 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                     break;
 
                 case 1:
-                    cookTime = value;
                     break;
 
                 case 2:
+                    cookTime = value;
+                    break;
+
+                case 3:
                     cookTimeTotal = value;
                     break;
             }
@@ -69,9 +74,10 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
 
         @Override
         public int size() {
-            return 3;
+            return 4;
         }
     };
+    private ItemStack inputStack;
 
     public ElectricFurnaceBlockEntity() {
         super(Factory.ELECTRIC_FURNACE_ENTITY_TYPE);
@@ -136,6 +142,27 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     }
 
     @Override
+    public boolean canInsert(int slot, ItemStack stack, Direction dir) {
+        return this.isValid(slot, stack);
+    }
+
+    private void onInvOpenOrClose() {
+        Block block = this.getCachedState().getBlock();
+        if (block instanceof QuarryBlock) {
+            this.world.addSyncedBlockEvent(this.pos, block, 1, this.viewerCount);
+            this.world.updateNeighborsAlways(this.pos, block);
+        }
+    }
+
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
+        if (this.world.getBlockEntity(this.pos) != this) return false;
+        else {
+            return player.squaredDistanceTo((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
+        }
+    }
+
+    @Override
     public void onOpen(PlayerEntity player) {
         if (!player.isSpectator()) {
             if (this.viewerCount < 0) {
@@ -155,20 +182,9 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         }
     }
 
-    private void onInvOpenOrClose() {
-        Block block = this.getCachedState().getBlock();
-        if (block instanceof QuarryBlock) {
-            this.world.addSyncedBlockEvent(this.pos, block, 1, this.viewerCount);
-            this.world.updateNeighborsAlways(this.pos, block);
-        }
-    }
-
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        if (this.world.getBlockEntity(this.pos) != this) return false;
-        else {
-            return player.squaredDistanceTo((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
-        }
+    public boolean isValid(int slot, ItemStack stack) {
+        return slot != 1;
     }
 
     @Override
@@ -201,7 +217,7 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
 
                 if (this.energy > 1) {
                     this.energy--;
-                    this.cookTime++;
+                    this.cookTime += 2;
                 }
 
                 if (cookTime == cookTimeTotal) {

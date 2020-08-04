@@ -1,11 +1,12 @@
 {
+  "tooltip.factory.power_bar": "Power: %1$s / %2$s",
+
   "itemGroup.factory.general": "Factory Mod",
 
   "block.factory.electric_furnace": "Electric Furnace",
   "item.factory.electric_furnace": "Electric Furnace",
 
   "block.factory.frame": "Frame",
-  "item.factory.frame": "Frame",
 
   "block.factory.generator": "Generator",
   "item.factory.generator": "Generator",

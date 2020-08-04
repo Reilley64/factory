@@ -13,8 +13,14 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 
 public class FactoryClient implements ClientModInitializer {
-    public static final Identifier FIRE_BAR_BG = new Identifier(Factory.MOD_ID, "textures/gui/fire_bar_bg.png");
+    public static final Identifier ENERGY_BAR = new Identifier(Factory.MOD_ID, "textures/gui/energy_bar.png");
+    public static final Identifier ENERGY_BAR_BG = new Identifier(Factory.MOD_ID, "textures/gui/energy_bar_bg.png");
+
     public static final Identifier FIRE_BAR = new Identifier(Factory.MOD_ID, "textures/gui/fire_bar.png");
+    public static final Identifier FIRE_BAR_BG = new Identifier(Factory.MOD_ID, "textures/gui/fire_bar_bg.png");
+
+    public static final Identifier PROGRESS_BAR = new Identifier(Factory.MOD_ID, "textures/gui/progress_bar.png");
+    public static final Identifier PROGRESS_BAR_BG = new Identifier(Factory.MOD_ID, "textures/gui/progress_bar_bg.png");
 
     @Override
     public void onInitializeClient() {

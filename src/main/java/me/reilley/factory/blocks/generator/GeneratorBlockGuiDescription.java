@@ -13,19 +13,20 @@ import net.minecraft.screen.ScreenHandlerContext;
 
 public class GeneratorBlockGuiDescription extends SyncedGuiDescription {
     public GeneratorBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(Factory.GENERATOR_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, 1), getBlockPropertyDelegate(context, 3));
+        super(Factory.GENERATOR_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, 1), getBlockPropertyDelegate(context, 4));
 
         WGridPanel root = new WGridPanel();
         setRootPanel(root);
-
-        WDynamicLabel label = new WDynamicLabel(() -> String.valueOf(propertyDelegate.get(0)));
-        root.add(label, 0, 1, 4, 1);
 
         WItemSlot wItemSlot = WItemSlot.of(blockInventory, 0);
         wItemSlot.setFilter(AbstractFurnaceBlockEntity::canUseAsFuel);
         root.add(wItemSlot, 4, 1);
 
-        WBar wBar = new WBar(FactoryClient.FIRE_BAR_BG, FactoryClient.FIRE_BAR, 1, 2);
+        WBar energyBar = new WBar(FactoryClient.ENERGY_BAR_BG, FactoryClient.ENERGY_BAR, 0, 1, WBar.Direction.UP);
+        energyBar.withTooltip("tooltip.factory.power_bar");
+        root.add(energyBar, 0, 1);
+
+        WBar wBar = new WBar(FactoryClient.FIRE_BAR_BG, FactoryClient.FIRE_BAR, 2, 3, WBar.Direction.UP);
         root.add(wBar, 4, 2);
 
         root.add(this.createPlayerInventoryPanel(), 0, 3);

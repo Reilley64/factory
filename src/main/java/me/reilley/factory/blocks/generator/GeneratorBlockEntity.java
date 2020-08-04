@@ -36,9 +36,12 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
                     return (int) energy;
 
                 case 1:
-                    return burnTime;
+                    return (int) getEnergyCapacity();
 
                 case 2:
+                    return burnTime;
+
+                case 3:
                     return fuelTime;
             }
 
@@ -53,10 +56,13 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
                     break;
 
                 case 1:
-                    burnTime = value;
                     break;
 
                 case 2:
+                    burnTime = value;
+                    break;
+
+                case 3:
                     fuelTime = value;
                     break;
             }
@@ -64,7 +70,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
         @Override
         public int size() {
-            return 3;
+            return 4;
         }
     };
 
