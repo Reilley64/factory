@@ -1,8 +1,12 @@
 {
   "variants": {
-    "facing=north": { "model":  "factory:block/electric_furnace" },
-    "facing=south": { "model":  "factory:block/electric_furnace", "y": 180 },
-    "facing=west":  { "model":  "factory:block/electric_furnace", "y": 270 },
-    "facing=east":  { "model":  "factory:block/electric_furnace", "y": 90 }
+    "facing=north,active=false": { "model":  "factory:block/electric_furnace_unpowered" },
+    "facing=south,active=false": { "model":  "factory:block/electric_furnace_unpowered", "y": 180 },
+    "facing=west,active=false":  { "model":  "factory:block/electric_furnace_unpowered", "y": 270 },
+    "facing=east,active=false":  { "model":  "factory:block/electric_furnace_unpowered", "y": 90 },
+    "facing=north,active=true": { "model":  "factory:block/electric_furnace_powered" },
+    "facing=south,active=true": { "model":  "factory:block/electric_furnace_powered", "y": 180 },
+    "facing=west,active=true":  { "model":  "factory:block/electric_furnace_powered", "y": 270 },
+    "facing=east,active=true":  { "model":  "factory:block/electric_furnace_powered", "y": 90 }
   }
 }

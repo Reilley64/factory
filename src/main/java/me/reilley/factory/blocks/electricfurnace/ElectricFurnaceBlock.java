@@ -34,7 +34,7 @@ public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryPr
 
     public ElectricFurnaceBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6)
-                .lightLevel(blockState -> blockState.get(GeneratorBlock.ACTIVE) ? 13 : 0));
+                .lightLevel(blockState -> blockState.get(GeneratorBlock.ACTIVE) ? 15 : 0));
         this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE,false));
     }
 
