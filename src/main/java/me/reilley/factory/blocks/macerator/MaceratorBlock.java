@@ -1,4 +1,4 @@
-package me.reilley.factory.blocks.electricfurnace;
+package me.reilley.factory.blocks.macerator;
 
 import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.generator.GeneratorBlock;
@@ -26,13 +26,13 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryProvider {
-    public static final String ID = "electric_furnace";
+public class MaceratorBlock extends BlockWithEntity implements InventoryProvider {
+    public static final String ID = "macerator";
 
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
     public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 
-    public ElectricFurnaceBlock() {
+    public MaceratorBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6)
                 .lightLevel(blockState -> blockState.get(GeneratorBlock.ACTIVE) ? 15 : 0));
         this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE,false));
@@ -64,7 +64,7 @@ public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryPr
 
     @Override
     public BlockEntity createBlockEntity(BlockView world) {
-        return new ElectricFurnaceBlockEntity();
+        return new MaceratorBlockEntity();
     }
 
     @Override
@@ -95,6 +95,6 @@ public class ElectricFurnaceBlock extends BlockWithEntity implements InventoryPr
 
     @Override
     public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
-        return ((ElectricFurnaceBlockEntity) world.getBlockEntity(pos));
+        return ((MaceratorBlockEntity) world.getBlockEntity(pos));
     }
 }

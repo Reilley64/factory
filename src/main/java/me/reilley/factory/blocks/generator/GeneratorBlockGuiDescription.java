@@ -7,13 +7,14 @@ import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import me.reilley.factory.Factory;
 import me.reilley.factory.FactoryClient;
+import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandlerContext;
 
 public class GeneratorBlockGuiDescription extends SyncedGuiDescription {
     public GeneratorBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(Factory.GENERATOR_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, 1), getBlockPropertyDelegate(context, 4));
+        super(FactoryScreenHandlerType.GENERATOR, syncId, playerInventory, getBlockInventory(context, 1), getBlockPropertyDelegate(context, 4));
 
         WGridPanel root = new WGridPanel();
         setRootPanel(root);

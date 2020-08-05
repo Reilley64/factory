@@ -4,6 +4,7 @@ import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import me.reilley.factory.Factory;
+import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandlerContext;
 
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class QuarryBlockGuiDescription extends SyncedGuiDescription {
     public QuarryBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(Factory.QUARRY_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, 27), getBlockPropertyDelegate(context));
+        super(FactoryScreenHandlerType.QUARRY, syncId, playerInventory, getBlockInventory(context, 27), getBlockPropertyDelegate(context));
 
         WGridPanel root = new WGridPanel();
         setRootPanel(root);

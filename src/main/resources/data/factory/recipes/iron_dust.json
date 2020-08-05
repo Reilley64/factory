@@ -1,0 +1,12 @@
+{
+  "type": "factory:crushing",
+  "input": {
+    "item": "minecraft:iron_ore",
+    "count": 1
+  },
+  "output": {
+    "item": "factory:iron_dust",
+    "count": 2
+  },
+  "crush_time": 200
+}

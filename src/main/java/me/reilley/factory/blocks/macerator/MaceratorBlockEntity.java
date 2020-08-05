@@ -1,10 +1,11 @@
-package me.reilley.factory.blocks.electricfurnace;
+package me.reilley.factory.blocks.macerator;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.quarry.QuarryBlock;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;
+import me.reilley.factory.recipes.CrushingRecipe;
 import me.reilley.factory.registry.FactoryBlockEntityType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -14,9 +15,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -27,12 +26,12 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
-public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
+public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
     private double energy = 0;
-    private int cookTime = 0;
-    private int cookTimeTotal = 0;
+    private int crushTime = 0;
+    private int crushTimeTotal = 0;
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
@@ -44,10 +43,10 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                     return (int) getEnergyCapacity();
 
                 case 2:
-                    return cookTime;
+                    return crushTime;
 
                 case 3:
-                    return cookTimeTotal;
+                    return crushTimeTotal;
             }
 
             return -1;
@@ -64,11 +63,11 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                     break;
 
                 case 2:
-                    cookTime = value;
+                    crushTime = value;
                     break;
 
                 case 3:
-                    cookTimeTotal = value;
+                    crushTimeTotal = value;
                     break;
             }
         }
@@ -80,8 +79,8 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     };
     private ItemStack inputStack;
 
-    public ElectricFurnaceBlockEntity() {
-        super(FactoryBlockEntityType.ELECTRIC_FURNACE);
+    public MaceratorBlockEntity() {
+        super(FactoryBlockEntityType.MACERATOR);
         this.inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
         this.inputStack = ItemStack.EMPTY;
     }
@@ -93,8 +92,8 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         Inventories.fromTag(tag, this.inventory);
         this.inputStack = this.inventory.get(0);
         this.energy = tag.getShort("Energy");
-        this.cookTime = tag.getShort("CookTime");
-        this.cookTimeTotal = tag.getShort("CookTimeTotal");
+        this.crushTime = tag.getShort("CrushTime");
+        this.crushTimeTotal = tag.getShort("CrushTimeTotal");
     }
 
     @Override
@@ -102,8 +101,8 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         super.toTag(tag);
         Inventories.toTag(tag, this.inventory);
         tag.putShort("Energy", (short) this.energy);
-        tag.putShort("BurnTime", (short) this.cookTime);
-        tag.putShort("FuelTime", (short) this.cookTimeTotal);
+        tag.putShort("CrushTime", (short) this.crushTime);
+        tag.putShort("CrushTimeTotal", (short) this.crushTimeTotal);
         return tag;
     }
 
@@ -195,7 +194,7 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
 
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inventory, PlayerEntity player) {
-        return new ElectricFurnaceBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
+        return new MaceratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
     }
 
     @Override
@@ -203,34 +202,35 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         if (!this.world.isClient) {
             if (!this.inventory.get(0).isItemEqual(inputStack)) {
                 this.inputStack = ItemStack.EMPTY;
-                this.cookTime = 0;
-                this.cookTimeTotal = 0;
+                this.crushTime = 0;
+                this.crushTimeTotal = 0;
             }
 
             if (!this.inventory.get(0).isEmpty()) {
-                Recipe<?> recipe = this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, this, this.world).orElse(null);
+                CrushingRecipe recipe = this.world.getRecipeManager().getFirstMatch(CrushingRecipe.Type.INSTANCE, this, this.world).orElse(null);
 
-                if (this.cookTimeTotal == 0 && canAcceptRecipeOutput(recipe)) {
-                    this.inputStack = this.inventory.get(0);
-                    this.cookTimeTotal = this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, this, this.world)
-                            .map(AbstractCookingRecipe::getCookTime).orElse(200);
-                }
+                if (recipe != null) {
+                    if (this.crushTimeTotal == 0 && canAcceptRecipeOutput(recipe)) {
+                        this.inputStack = this.inventory.get(0);
+                        this.crushTimeTotal = recipe.getCrushTime();
+                    }
 
-                if (this.energy > 1) {
-                    this.energy--;
-                    this.cookTime += 2;
-                }
+                    if (this.energy > 1) {
+                        this.energy--;
+                        this.crushTime++;
+                    }
 
-                if (cookTime == cookTimeTotal) {
-                    if (this.inventory.get(1).isEmpty()) this.inventory.set(1, recipe.getOutput());
-                    else this.inventory.get(1).increment(1);
-                    this.inventory.get(0).decrement(1);
-                    this.cookTime = 0;
-                    this.cookTimeTotal = 0;
+                    if (crushTime == crushTimeTotal) {
+                        if (this.inventory.get(1).isEmpty()) this.inventory.set(1, recipe.getOutput());
+                        else this.inventory.get(1).increment(recipe.getOutput().getCount());
+                        this.inventory.get(0).decrement(1);
+                        this.crushTime = 0;
+                        this.crushTimeTotal = 0;
+                    }
                 }
             }
 
-            ElectricFurnaceBlock.setActive(cookTimeTotal > 0, this.world, this.pos);
+            MaceratorBlock.setActive(crushTimeTotal > 0, this.world, this.pos);
         }
     }
 

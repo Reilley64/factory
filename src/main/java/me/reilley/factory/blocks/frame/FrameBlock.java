@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FrameBlock extends Block {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "frame");
+    public static final String ID = "frame";
 
     public static final BooleanProperty EAST = BooleanProperty.of("east");
     public static final BooleanProperty WEST = BooleanProperty.of("west");

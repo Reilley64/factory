@@ -1,17 +1,18 @@
-package me.reilley.factory.blocks.electricfurnace;
+package me.reilley.factory.blocks.macerator;
 
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WBar;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
+import me.reilley.factory.Factory;
 import me.reilley.factory.FactoryClient;
 import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandlerContext;
 
-public class ElectricFurnaceBlockGuiDescription extends SyncedGuiDescription {
-    public ElectricFurnaceBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(FactoryScreenHandlerType.ELECTRIC_FURNACE, syncId, playerInventory, getBlockInventory(context, 2), getBlockPropertyDelegate(context, 4));
+public class MaceratorBlockGuiDescription extends SyncedGuiDescription {
+    public MaceratorBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(FactoryScreenHandlerType.MACERATOR, syncId, playerInventory, getBlockInventory(context, 2), getBlockPropertyDelegate(context, 4));
 
         WGridPanel root = new WGridPanel();
         setRootPanel(root);

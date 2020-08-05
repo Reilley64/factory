@@ -27,7 +27,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
 public class GeneratorBlock extends BlockWithEntity implements InventoryProvider {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "generator");
+    public static final String ID = "generator";
+
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
     public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 

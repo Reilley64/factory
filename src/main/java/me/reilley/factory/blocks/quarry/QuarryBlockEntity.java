@@ -5,6 +5,8 @@ import me.reilley.factory.blocks.frame.FrameBlock;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;
 import me.reilley.factory.misc.RectangularPrismIterator;
+import me.reilley.factory.registry.FactoryBlock;
+import me.reilley.factory.registry.FactoryBlockEntityType;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,7 +45,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
     private int maxZ;
 
     public QuarryBlockEntity() {
-        super(Factory.QUARRY_ENTITY_TYPE);
+        super(FactoryBlockEntityType.QUARRY);
         this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
     }
 
@@ -343,7 +345,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
         @Override
         public void run() {
             energy -= getEnergyRequired();
-            world.setBlockState(this.pos, Factory.FRAME_BLOCK.getDefaultState());
+            world.setBlockState(this.pos, FactoryBlock.FRAME.getDefaultState());
         }
     }
 }

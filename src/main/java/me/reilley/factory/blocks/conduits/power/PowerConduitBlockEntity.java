@@ -1,7 +1,7 @@
 package me.reilley.factory.blocks.conduits.power;
 
-import me.reilley.factory.Factory;
 import me.reilley.factory.misc.FactoryEnergy;
+import me.reilley.factory.registry.FactoryBlockEntityType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -16,7 +16,7 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
     private double energy = 0;
 
     public PowerConduitBlockEntity() {
-        super(Factory.POWER_CONDUIT_ENTITY_TYPE);
+        super(FactoryBlockEntityType.POWER_CONDUIT);
     }
 
     @Override

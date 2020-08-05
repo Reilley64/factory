@@ -5,6 +5,7 @@ import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.quarry.QuarryBlock;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;
+import me.reilley.factory.registry.FactoryBlockEntityType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
@@ -75,7 +76,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
     };
 
     public GeneratorBlockEntity() {
-        super(Factory.GENERATOR_ENTITY_TYPE);
+        super(FactoryBlockEntityType.GENERATOR);
         this.inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
     }
 

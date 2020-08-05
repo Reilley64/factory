@@ -27,13 +27,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
 public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "quarry");
+    public static final String ID = "quarry";
+
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
     public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 
     public QuarryBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
-        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE, false));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE, true));
     }
 
     public void setFacing(Direction facing, World world, BlockPos pos) {

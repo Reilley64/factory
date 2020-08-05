@@ -1,6 +1,5 @@
 package me.reilley.factory.blocks.conduits.power;
 
-import me.reilley.factory.Factory;
 import me.reilley.factory.misc.FactoryEnergy;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
@@ -8,7 +7,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -21,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PowerConduitBlock extends BlockWithEntity {
-    public static final Identifier ID = new Identifier(Factory.MOD_ID, "powerconduit");
+    public static final String ID = "powerconduit";
 
     public static final BooleanProperty EAST = BooleanProperty.of("east");
     public static final BooleanProperty WEST = BooleanProperty.of("west");
