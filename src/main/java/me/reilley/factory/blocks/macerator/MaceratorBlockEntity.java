@@ -1,7 +1,6 @@
 package me.reilley.factory.blocks.macerator;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
-import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.quarry.QuarryBlock;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;

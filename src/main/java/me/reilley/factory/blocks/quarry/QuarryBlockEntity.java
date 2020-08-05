@@ -1,6 +1,5 @@
 package me.reilley.factory.blocks.quarry;
 
-import me.reilley.factory.Factory;
 import me.reilley.factory.blocks.frame.FrameBlock;
 import me.reilley.factory.misc.FactoryEnergy;
 import me.reilley.factory.misc.FactoryInventory;

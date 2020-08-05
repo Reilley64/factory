@@ -3,7 +3,6 @@ package me.reilley.factory.blocks.quarry;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
-import me.reilley.factory.Factory;
 import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandlerContext;

@@ -4,6 +4,8 @@ import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockGuiDescript
 import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockScreen;
 import me.reilley.factory.blocks.generator.GeneratorBlockGuiDescription;
 import me.reilley.factory.blocks.generator.GeneratorBlockScreen;
+import me.reilley.factory.blocks.macerator.MaceratorBlockGuiDescription;
+import me.reilley.factory.blocks.macerator.MaceratorBlockScreen;
 import me.reilley.factory.blocks.quarry.QuarryBlockGuiDescription;
 import me.reilley.factory.blocks.quarry.QuarryBlockScreen;
 import me.reilley.factory.registry.FactoryBlock;
@@ -30,5 +32,6 @@ public class FactoryClient implements ClientModInitializer {
         ScreenRegistry.<QuarryBlockGuiDescription, QuarryBlockScreen>register(FactoryScreenHandlerType.QUARRY, (gui, inventory, title) -> new QuarryBlockScreen(gui, inventory.player, title));
         ScreenRegistry.<GeneratorBlockGuiDescription, GeneratorBlockScreen>register(FactoryScreenHandlerType.GENERATOR, (gui, inventory, title) -> new GeneratorBlockScreen(gui, inventory.player, title));
         ScreenRegistry.<ElectricFurnaceBlockGuiDescription, ElectricFurnaceBlockScreen>register(FactoryScreenHandlerType.ELECTRIC_FURNACE, (gui, inventory, title) -> new ElectricFurnaceBlockScreen(gui, inventory.player, title));
+        ScreenRegistry.<MaceratorBlockGuiDescription, MaceratorBlockScreen>register(FactoryScreenHandlerType.MACERATOR, (gui, inventory, title) -> new MaceratorBlockScreen(gui, inventory.player, title));
     }
 }

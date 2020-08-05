@@ -1,6 +1,5 @@
 package me.reilley.factory.misc;
 
-import me.reilley.factory.blocks.conduits.power.PowerConduitBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;

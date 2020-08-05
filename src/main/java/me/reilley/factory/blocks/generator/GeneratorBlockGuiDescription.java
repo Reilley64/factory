@@ -2,10 +2,8 @@ package me.reilley.factory.blocks.generator;
 
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WBar;
-import io.github.cottonmc.cotton.gui.widget.WDynamicLabel;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
-import me.reilley.factory.Factory;
 import me.reilley.factory.FactoryClient;
 import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;

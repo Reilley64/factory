@@ -1,7 +1,5 @@
 package me.reilley.factory;
 
-import me.reilley.factory.blocks.macerator.MaceratorBlock;
-import me.reilley.factory.blocks.macerator.MaceratorBlockEntity;
 import me.reilley.factory.recipes.CrushingRecipe;
 import me.reilley.factory.registry.FactoryBlock;
 import me.reilley.factory.registry.FactoryBlockEntityType;
@@ -9,10 +7,6 @@ import me.reilley.factory.registry.FactoryItem;
 import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
