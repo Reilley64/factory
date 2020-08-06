@@ -32,61 +32,63 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     private static final int[] TOP_SLOTS = new int[]{0};
     private static final int[] BOTTOM_SLOTS = new int[]{1};
     private static final int[] SIDE_SLOTS = new int[]{1};
+    private final PropertyDelegate propertyDelegate;
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
     private double energy = 0;
     private int cookTime = 0;
     private int cookTimeTotal = 0;
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
-        @Override
-        public int get(int index) {
-            switch (index) {
-                case 0:
-                    return (int) energy;
-
-                case 1:
-                    return (int) getEnergyCapacity();
-
-                case 2:
-                    return cookTime;
-
-                case 3:
-                    return cookTimeTotal;
-            }
-
-            return -1;
-        }
-
-        @Override
-        public void set(int index, int value) {
-            switch (index) {
-                case 0:
-                    energy = value;
-                    break;
-
-                case 1:
-                    break;
-
-                case 2:
-                    cookTime = value;
-                    break;
-
-                case 3:
-                    cookTimeTotal = value;
-                    break;
-            }
-        }
-
-        @Override
-        public int size() {
-            return 4;
-        }
-    };
     private ItemStack inputStack;
+
     public ElectricFurnaceBlockEntity() {
         super(FactoryBlockEntityType.ELECTRIC_FURNACE);
         this.inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
         this.inputStack = ItemStack.EMPTY;
+        this.propertyDelegate = new PropertyDelegate() {
+            @Override
+            public int get(int index) {
+                switch (index) {
+                    case 0:
+                        return (int) energy;
+
+                    case 1:
+                        return (int) getEnergyCapacity();
+
+                    case 2:
+                        return cookTime;
+
+                    case 3:
+                        return cookTimeTotal;
+                }
+
+                return -1;
+            }
+
+            @Override
+            public void set(int index, int value) {
+                switch (index) {
+                    case 0:
+                        energy = value;
+                        break;
+
+                    case 1:
+                        break;
+
+                    case 2:
+                        cookTime = value;
+                        break;
+
+                    case 3:
+                        cookTimeTotal = value;
+                        break;
+                }
+            }
+
+            @Override
+            public int size() {
+                return 4;
+            }
+        };
     }
 
     @Override

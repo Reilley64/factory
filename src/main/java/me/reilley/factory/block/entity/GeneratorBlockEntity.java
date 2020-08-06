@@ -2,11 +2,11 @@ package me.reilley.factory.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import me.reilley.factory.block.GeneratorBlock;
-import me.reilley.factory.screen.GeneratorBlockGuiDescription;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.energy.FactoryEnergy;
 import me.reilley.factory.inventory.FactoryInventory;
 import me.reilley.factory.registry.FactoryBlockEntityType;
+import me.reilley.factory.screen.GeneratorBlockGuiDescription;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
@@ -16,7 +16,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.screen.*;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
@@ -24,61 +27,61 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
 public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
+    private final PropertyDelegate propertyDelegate;
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
     private double energy = 0;
     private int burnTime = 0;
     private int fuelTime = 0;
 
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
-        @Override
-        public int get(int index) {
-            switch (index) {
-                case 0:
-                    return (int) energy;
-
-                case 1:
-                    return (int) getEnergyCapacity();
-
-                case 2:
-                    return burnTime;
-
-                case 3:
-                    return fuelTime;
-            }
-
-            return -1;
-        }
-
-        @Override
-        public void set(int index, int value) {
-            switch (index) {
-                case 0:
-                    energy = value;
-                    break;
-
-                case 1:
-                    break;
-
-                case 2:
-                    burnTime = value;
-                    break;
-
-                case 3:
-                    fuelTime = value;
-                    break;
-            }
-        }
-
-        @Override
-        public int size() {
-            return 4;
-        }
-    };
-
     public GeneratorBlockEntity() {
         super(FactoryBlockEntityType.GENERATOR);
         this.inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
+        this.propertyDelegate = new PropertyDelegate() {
+            @Override
+            public int get(int index) {
+                switch (index) {
+                    case 0:
+                        return (int) energy;
+
+                    case 1:
+                        return (int) getEnergyCapacity();
+
+                    case 2:
+                        return burnTime;
+
+                    case 3:
+                        return fuelTime;
+                }
+
+                return -1;
+            }
+
+            @Override
+            public void set(int index, int value) {
+                switch (index) {
+                    case 0:
+                        energy = value;
+                        break;
+
+                    case 1:
+                        break;
+
+                    case 2:
+                        burnTime = value;
+                        break;
+
+                    case 3:
+                        fuelTime = value;
+                        break;
+                }
+            }
+
+            @Override
+            public int size() {
+                return 4;
+            }
+        };
     }
 
     @Override

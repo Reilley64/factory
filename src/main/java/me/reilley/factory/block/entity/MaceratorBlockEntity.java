@@ -2,12 +2,12 @@ package me.reilley.factory.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import me.reilley.factory.block.MaceratorBlock;
-import me.reilley.factory.screen.MaceratorBlockGuiDescription;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.energy.FactoryEnergy;
 import me.reilley.factory.inventory.FactoryInventory;
 import me.reilley.factory.recipe.CrushingRecipe;
 import me.reilley.factory.registry.FactoryBlockEntityType;
+import me.reilley.factory.screen.MaceratorBlockGuiDescription;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -31,62 +31,63 @@ public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, 
     private static final int[] TOP_SLOTS = new int[]{0};
     private static final int[] BOTTOM_SLOTS = new int[]{1};
     private static final int[] SIDE_SLOTS = new int[]{1};
+    private final PropertyDelegate propertyDelegate;
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
     private double energy = 0;
     private int crushTime = 0;
     private int crushTimeTotal = 0;
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
-        @Override
-        public int get(int index) {
-            switch (index) {
-                case 0:
-                    return (int) energy;
-
-                case 1:
-                    return (int) getEnergyCapacity();
-
-                case 2:
-                    return crushTime;
-
-                case 3:
-                    return crushTimeTotal;
-            }
-
-            return -1;
-        }
-
-        @Override
-        public void set(int index, int value) {
-            switch (index) {
-                case 0:
-                    energy = value;
-                    break;
-
-                case 1:
-                    break;
-
-                case 2:
-                    crushTime = value;
-                    break;
-
-                case 3:
-                    crushTimeTotal = value;
-                    break;
-            }
-        }
-
-        @Override
-        public int size() {
-            return 4;
-        }
-    };
     private ItemStack inputStack;
 
     public MaceratorBlockEntity() {
         super(FactoryBlockEntityType.MACERATOR);
         this.inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
         this.inputStack = ItemStack.EMPTY;
+        this.propertyDelegate = new PropertyDelegate() {
+            @Override
+            public int get(int index) {
+                switch (index) {
+                    case 0:
+                        return (int) energy;
+
+                    case 1:
+                        return (int) getEnergyCapacity();
+
+                    case 2:
+                        return crushTime;
+
+                    case 3:
+                        return crushTimeTotal;
+                }
+
+                return -1;
+            }
+
+            @Override
+            public void set(int index, int value) {
+                switch (index) {
+                    case 0:
+                        energy = value;
+                        break;
+
+                    case 1:
+                        break;
+
+                    case 2:
+                        crushTime = value;
+                        break;
+
+                    case 3:
+                        crushTimeTotal = value;
+                        break;
+                }
+            }
+
+            @Override
+            public int size() {
+                return 4;
+            }
+        };
     }
 
     @Override
