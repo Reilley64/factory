@@ -3,13 +3,29 @@
 
   "itemGroup.factory.general": "Factory Mod",
 
+  "item.factory.coal_dust": "Coal Dust",
+
+  "item.factory.diamond_dust": "Diamond Dust",
+
   "block.factory.electric_furnace": "Electric Furnace",
   "item.factory.electric_furnace": "Electric Furnace",
+
+  "item.factory.emerald_dust": "Emerald Dust",
 
   "block.factory.frame": "Frame",
 
   "block.factory.generator": "Generator",
   "item.factory.generator": "Generator",
+
+  "item.factory.gold_dust": "Gold Dust",
+
+  "item.factory.iron_dust": "Iron Dust",
+
+  "block.factory.macerator": "Macerator",
+  "item.factory.macerator": "Macerator",
+
+  "block.factory.powerconduit": "Power Conduit",
+  "item.factory.powerconduit": "Power Conduit",
 
   "block.factory.quarry": "Quarry",
   "item.factory.quarry": "Quarry"

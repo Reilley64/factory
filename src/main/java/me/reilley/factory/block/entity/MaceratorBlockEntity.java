@@ -28,6 +28,9 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
 public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
+    private static final int[] TOP_SLOTS = new int[]{0};
+    private static final int[] BOTTOM_SLOTS = new int[]{1};
+    private static final int[] SIDE_SLOTS = new int[]{1};
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
     private double energy = 0;
@@ -143,6 +146,12 @@ public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, 
     }
 
     @Override
+    public int[] getAvailableSlots(Direction side) {
+        if (side == Direction.DOWN) return BOTTOM_SLOTS;
+        else return side == Direction.UP ? TOP_SLOTS : SIDE_SLOTS;
+    }
+
+    @Override
     public boolean canInsert(int slot, ItemStack stack, Direction dir) {
         return this.isValid(slot, stack);
     }
@@ -223,7 +232,7 @@ public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
                     if (crushTime == crushTimeTotal) {
                         if (this.inventory.get(1).isEmpty()) this.inventory.set(1, recipe.getOutput().copy());
-                        else this.inventory.get(1).increment(1);
+                        else this.inventory.get(1).increment(recipe.getOutput().getCount());
                         this.inventory.get(0).decrement(1);
                         this.crushTime = 0;
                         this.crushTimeTotal = 0;

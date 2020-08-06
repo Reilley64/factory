@@ -2,11 +2,11 @@ package me.reilley.factory.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import me.reilley.factory.block.ElectricFurnaceBlock;
-import me.reilley.factory.screen.ElectricFurnaceBlockGuiDescription;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.energy.FactoryEnergy;
 import me.reilley.factory.inventory.FactoryInventory;
 import me.reilley.factory.registry.FactoryBlockEntityType;
+import me.reilley.factory.screen.ElectricFurnaceBlockGuiDescription;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -29,6 +29,9 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
 public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
+    private static final int[] TOP_SLOTS = new int[]{0};
+    private static final int[] BOTTOM_SLOTS = new int[]{1};
+    private static final int[] SIDE_SLOTS = new int[]{1};
     private DefaultedList<ItemStack> inventory;
     private int viewerCount;
     private double energy = 0;
@@ -80,7 +83,6 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         }
     };
     private ItemStack inputStack;
-
     public ElectricFurnaceBlockEntity() {
         super(FactoryBlockEntityType.ELECTRIC_FURNACE);
         this.inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
@@ -141,6 +143,12 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     @Override
     public DefaultedList<ItemStack> getInventory() {
         return inventory;
+    }
+
+    @Override
+    public int[] getAvailableSlots(Direction side) {
+        if (side == Direction.DOWN) return BOTTOM_SLOTS;
+        else return side == Direction.UP ? TOP_SLOTS : SIDE_SLOTS;
     }
 
     @Override
@@ -224,7 +232,7 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
 
                     if (cookTime == cookTimeTotal) {
                         if (this.inventory.get(1).isEmpty()) this.inventory.set(1, recipe.getOutput().copy());
-                        else this.inventory.get(1).increment(1);
+                        else this.inventory.get(1).increment(recipe.getOutput().getCount());
                         this.inventory.get(0).decrement(1);
                         this.cookTime = 0;
                         this.cookTimeTotal = 0;
