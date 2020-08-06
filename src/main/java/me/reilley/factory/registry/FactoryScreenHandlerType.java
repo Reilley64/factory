@@ -1,14 +1,14 @@
 package me.reilley.factory.registry;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlock;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockGuiDescription;
-import me.reilley.factory.blocks.generator.GeneratorBlock;
-import me.reilley.factory.blocks.generator.GeneratorBlockGuiDescription;
-import me.reilley.factory.blocks.macerator.MaceratorBlock;
-import me.reilley.factory.blocks.macerator.MaceratorBlockGuiDescription;
-import me.reilley.factory.blocks.quarry.QuarryBlock;
-import me.reilley.factory.blocks.quarry.QuarryBlockGuiDescription;
+import me.reilley.factory.block.ElectricFurnaceBlock;
+import me.reilley.factory.screen.ElectricFurnaceBlockGuiDescription;
+import me.reilley.factory.block.GeneratorBlock;
+import me.reilley.factory.screen.GeneratorBlockGuiDescription;
+import me.reilley.factory.block.MaceratorBlock;
+import me.reilley.factory.screen.MaceratorBlockGuiDescription;
+import me.reilley.factory.block.QuarryBlock;
+import me.reilley.factory.screen.QuarryBlockGuiDescription;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;

@@ -1,13 +1,13 @@
 package me.reilley.factory;
 
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockGuiDescription;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockScreen;
-import me.reilley.factory.blocks.generator.GeneratorBlockGuiDescription;
-import me.reilley.factory.blocks.generator.GeneratorBlockScreen;
-import me.reilley.factory.blocks.macerator.MaceratorBlockGuiDescription;
-import me.reilley.factory.blocks.macerator.MaceratorBlockScreen;
-import me.reilley.factory.blocks.quarry.QuarryBlockGuiDescription;
-import me.reilley.factory.blocks.quarry.QuarryBlockScreen;
+import me.reilley.factory.screen.ElectricFurnaceBlockGuiDescription;
+import me.reilley.factory.client.screen.ElectricFurnaceBlockScreen;
+import me.reilley.factory.screen.GeneratorBlockGuiDescription;
+import me.reilley.factory.client.screen.GeneratorBlockScreen;
+import me.reilley.factory.screen.MaceratorBlockGuiDescription;
+import me.reilley.factory.client.screen.MaceratorBlockScreen;
+import me.reilley.factory.screen.QuarryBlockGuiDescription;
+import me.reilley.factory.client.screen.QuarryBlockScreen;
 import me.reilley.factory.registry.FactoryBlock;
 import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.fabricmc.api.ClientModInitializer;

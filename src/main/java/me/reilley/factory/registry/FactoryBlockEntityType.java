@@ -1,16 +1,16 @@
 package me.reilley.factory.registry;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.blocks.conduits.power.PowerConduitBlock;
-import me.reilley.factory.blocks.conduits.power.PowerConduitBlockEntity;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlock;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlockEntity;
-import me.reilley.factory.blocks.generator.GeneratorBlock;
-import me.reilley.factory.blocks.generator.GeneratorBlockEntity;
-import me.reilley.factory.blocks.macerator.MaceratorBlock;
-import me.reilley.factory.blocks.macerator.MaceratorBlockEntity;
-import me.reilley.factory.blocks.quarry.QuarryBlock;
-import me.reilley.factory.blocks.quarry.QuarryBlockEntity;
+import me.reilley.factory.block.PowerConduitBlock;
+import me.reilley.factory.block.entity.PowerConduitBlockEntity;
+import me.reilley.factory.block.ElectricFurnaceBlock;
+import me.reilley.factory.block.entity.ElectricFurnaceBlockEntity;
+import me.reilley.factory.block.GeneratorBlock;
+import me.reilley.factory.block.entity.GeneratorBlockEntity;
+import me.reilley.factory.block.MaceratorBlock;
+import me.reilley.factory.block.entity.MaceratorBlockEntity;
+import me.reilley.factory.block.QuarryBlock;
+import me.reilley.factory.block.entity.QuarryBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;

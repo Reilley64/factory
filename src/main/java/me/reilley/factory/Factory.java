@@ -1,6 +1,6 @@
 package me.reilley.factory;
 
-import me.reilley.factory.recipes.CrushingRecipe;
+import me.reilley.factory.recipe.CrushingRecipe;
 import me.reilley.factory.registry.FactoryBlock;
 import me.reilley.factory.registry.FactoryBlockEntityType;
 import me.reilley.factory.registry.FactoryItem;

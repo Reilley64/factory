@@ -1,19 +1,23 @@
 package me.reilley.factory.registry;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.blocks.conduits.power.PowerConduitBlock;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlock;
-import me.reilley.factory.blocks.generator.GeneratorBlock;
-import me.reilley.factory.blocks.macerator.MaceratorBlock;
-import me.reilley.factory.blocks.quarry.QuarryBlock;
+import me.reilley.factory.block.PowerConduitBlock;
+import me.reilley.factory.block.ElectricFurnaceBlock;
+import me.reilley.factory.block.GeneratorBlock;
+import me.reilley.factory.block.MaceratorBlock;
+import me.reilley.factory.block.QuarryBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class FactoryItem {
+    public static final Item COAL_DUST = register("coal_dust", new Item(new Item.Settings().group(Factory.ITEM_GROUP)));
+    public static final Item DIAMOND_DUST = register("diamond_dust", new Item(new Item.Settings().group(Factory.ITEM_GROUP)));
     public static final Item ELECTRIC_FURNACE = register(ElectricFurnaceBlock.ID, new BlockItem(FactoryBlock.ELECTRIC_FURNACE, new Item.Settings().group(Factory.ITEM_GROUP)));
+    public static final Item EMERALD_DUST = register("emerald_dust", new Item(new Item.Settings().group(Factory.ITEM_GROUP)));
     public static final Item GENERATOR = register(GeneratorBlock.ID, new BlockItem(FactoryBlock.GENERATOR, new Item.Settings().group(Factory.ITEM_GROUP)));
+    public static final Item GOLD_DUST = register("gold_dust", new Item(new Item.Settings().group(Factory.ITEM_GROUP)));
     public static final Item IRON_DUST = register("iron_dust", new Item(new Item.Settings().group(Factory.ITEM_GROUP)));
     public static final Item MACERATOR = register(MaceratorBlock.ID, new BlockItem(FactoryBlock.MACERATOR, new Item.Settings().group(Factory.ITEM_GROUP)));
     public static final Item POWER_CONDUIT = register(PowerConduitBlock.ID, new BlockItem(FactoryBlock.POWER_CONDUIT, new Item.Settings().group(Factory.ITEM_GROUP)));

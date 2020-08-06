@@ -1,28 +1,25 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "RRR",
-    "GIG",
-    "DPD"
+    "FFF",
+    "CIC",
+    "RRR"
   ],
   "key": {
-    "D": {
-      "item": "minecraft:diamond"
-    },
-    "G": {
-      "item": "minecraft:gold_ingot"
+    "C": {
+      "item": "minecraft:cobblestone"
     },
     "I": {
       "item": "minecraft:iron_block"
     },
-    "P": {
-      "item": "minecraft:diamond_pickaxe"
+    "F": {
+      "item": "minecraft:flint"
     },
     "R": {
       "item": "minecraft:redstone"
     }
   },
   "result": {
-    "item": "factory:quarry"
+    "item": "factory:macerator"
   }
 }

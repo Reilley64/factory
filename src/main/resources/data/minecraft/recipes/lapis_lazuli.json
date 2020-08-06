@@ -1,0 +1,12 @@
+{
+  "type": "factory:crushing",
+  "input": {
+    "item": "minecraft:lapis_ore",
+    "count": 1
+  },
+  "output": {
+    "item": "minecraft:lapis_lazuli",
+    "count": 16
+  },
+  "crush_time": 200
+}

@@ -1,0 +1,12 @@
+{
+  "type": "factory:crushing",
+  "input": {
+    "item": "minecraft:redstone_ore",
+    "count": 1
+  },
+  "output": {
+    "item": "minecraft:redstone",
+    "count": 8
+  },
+  "crush_time": 200
+}

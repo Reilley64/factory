@@ -1,12 +1,12 @@
 package me.reilley.factory.registry;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.blocks.conduits.power.PowerConduitBlock;
-import me.reilley.factory.blocks.electricfurnace.ElectricFurnaceBlock;
-import me.reilley.factory.blocks.frame.FrameBlock;
-import me.reilley.factory.blocks.generator.GeneratorBlock;
-import me.reilley.factory.blocks.macerator.MaceratorBlock;
-import me.reilley.factory.blocks.quarry.QuarryBlock;
+import me.reilley.factory.block.PowerConduitBlock;
+import me.reilley.factory.block.ElectricFurnaceBlock;
+import me.reilley.factory.block.FrameBlock;
+import me.reilley.factory.block.GeneratorBlock;
+import me.reilley.factory.block.MaceratorBlock;
+import me.reilley.factory.block.QuarryBlock;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
