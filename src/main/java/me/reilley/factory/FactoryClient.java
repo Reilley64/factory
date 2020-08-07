@@ -4,8 +4,8 @@ import me.reilley.factory.screen.ElectricFurnaceBlockGuiDescription;
 import me.reilley.factory.client.screen.ElectricFurnaceBlockScreen;
 import me.reilley.factory.screen.GeneratorBlockGuiDescription;
 import me.reilley.factory.client.screen.GeneratorBlockScreen;
-import me.reilley.factory.screen.MaceratorBlockGuiDescription;
-import me.reilley.factory.client.screen.MaceratorBlockScreen;
+import me.reilley.factory.screen.PulverizerBlockGuiDescription;
+import me.reilley.factory.client.screen.PulverizerBlockScreen;
 import me.reilley.factory.screen.QuarryBlockGuiDescription;
 import me.reilley.factory.client.screen.QuarryBlockScreen;
 import me.reilley.factory.registry.FactoryBlock;
@@ -28,10 +28,10 @@ public class FactoryClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        BlockRenderLayerMap.INSTANCE.putBlock(FactoryBlock.FRAME, RenderLayer.getCutout());
-        ScreenRegistry.<QuarryBlockGuiDescription, QuarryBlockScreen>register(FactoryScreenHandlerType.QUARRY, (gui, inventory, title) -> new QuarryBlockScreen(gui, inventory.player, title));
-        ScreenRegistry.<GeneratorBlockGuiDescription, GeneratorBlockScreen>register(FactoryScreenHandlerType.GENERATOR, (gui, inventory, title) -> new GeneratorBlockScreen(gui, inventory.player, title));
         ScreenRegistry.<ElectricFurnaceBlockGuiDescription, ElectricFurnaceBlockScreen>register(FactoryScreenHandlerType.ELECTRIC_FURNACE, (gui, inventory, title) -> new ElectricFurnaceBlockScreen(gui, inventory.player, title));
-        ScreenRegistry.<MaceratorBlockGuiDescription, MaceratorBlockScreen>register(FactoryScreenHandlerType.MACERATOR, (gui, inventory, title) -> new MaceratorBlockScreen(gui, inventory.player, title));
+        BlockRenderLayerMap.INSTANCE.putBlock(FactoryBlock.FRAME, RenderLayer.getCutout());
+        ScreenRegistry.<GeneratorBlockGuiDescription, GeneratorBlockScreen>register(FactoryScreenHandlerType.GENERATOR, (gui, inventory, title) -> new GeneratorBlockScreen(gui, inventory.player, title));
+        ScreenRegistry.<PulverizerBlockGuiDescription, PulverizerBlockScreen>register(FactoryScreenHandlerType.PULVERIZER, (gui, inventory, title) -> new PulverizerBlockScreen(gui, inventory.player, title));
+        ScreenRegistry.<QuarryBlockGuiDescription, QuarryBlockScreen>register(FactoryScreenHandlerType.QUARRY, (gui, inventory, title) -> new QuarryBlockScreen(gui, inventory.player, title));
     }
 }

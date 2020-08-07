@@ -1,8 +1,7 @@
 package me.reilley.factory.block;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.block.entity.MaceratorBlockEntity;
-import me.reilley.factory.block.GeneratorBlock;
+import me.reilley.factory.block.entity.PulverizerBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -27,13 +26,13 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-public class MaceratorBlock extends BlockWithEntity implements InventoryProvider {
-    public static final String ID = "macerator";
+public class PulverizerBlock extends BlockWithEntity implements InventoryProvider {
+    public static final String ID = "pulverizer";
 
     public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
     public static BooleanProperty ACTIVE = BooleanProperty.of("active");
 
-    public MaceratorBlock() {
+    public PulverizerBlock() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6)
                 .lightLevel(blockState -> blockState.get(GeneratorBlock.ACTIVE) ? 15 : 0));
         this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE,false));
@@ -65,7 +64,7 @@ public class MaceratorBlock extends BlockWithEntity implements InventoryProvider
 
     @Override
     public BlockEntity createBlockEntity(BlockView world) {
-        return new MaceratorBlockEntity();
+        return new PulverizerBlockEntity();
     }
 
     @Override
@@ -96,6 +95,6 @@ public class MaceratorBlock extends BlockWithEntity implements InventoryProvider
 
     @Override
     public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
-        return ((MaceratorBlockEntity) world.getBlockEntity(pos));
+        return ((PulverizerBlockEntity) world.getBlockEntity(pos));
     }
 }

@@ -7,8 +7,8 @@ import me.reilley.factory.block.ElectricFurnaceBlock;
 import me.reilley.factory.block.entity.ElectricFurnaceBlockEntity;
 import me.reilley.factory.block.GeneratorBlock;
 import me.reilley.factory.block.entity.GeneratorBlockEntity;
-import me.reilley.factory.block.MaceratorBlock;
-import me.reilley.factory.block.entity.MaceratorBlockEntity;
+import me.reilley.factory.block.PulverizerBlock;
+import me.reilley.factory.block.entity.PulverizerBlockEntity;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.block.entity.QuarryBlockEntity;
 import net.minecraft.block.Block;
@@ -22,8 +22,8 @@ import java.util.function.Supplier;
 public class FactoryBlockEntityType {
     public static final BlockEntityType<ElectricFurnaceBlockEntity> ELECTRIC_FURNACE = register(ElectricFurnaceBlock.ID, ElectricFurnaceBlockEntity::new, FactoryBlock.ELECTRIC_FURNACE);
     public static final BlockEntityType<GeneratorBlockEntity> GENERATOR = register(GeneratorBlock.ID, GeneratorBlockEntity::new, FactoryBlock.GENERATOR);
-    public static final BlockEntityType<MaceratorBlockEntity> MACERATOR = register(MaceratorBlock.ID, MaceratorBlockEntity::new, FactoryBlock.MACERATOR);
     public static final BlockEntityType<PowerConduitBlockEntity> POWER_CONDUIT = register(PowerConduitBlock.ID, PowerConduitBlockEntity::new, FactoryBlock.POWER_CONDUIT);
+    public static final BlockEntityType<PulverizerBlockEntity> PULVERIZER = register(PulverizerBlock.ID, PulverizerBlockEntity::new, FactoryBlock.PULVERIZER);
     public static final BlockEntityType<QuarryBlockEntity> QUARRY = register(QuarryBlock.ID, QuarryBlockEntity::new, FactoryBlock.QUARRY);
 
     public static void initialize() {

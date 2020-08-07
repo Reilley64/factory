@@ -9,9 +9,9 @@ import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandlerContext;
 
-public class MaceratorBlockGuiDescription extends SyncedGuiDescription {
-    public MaceratorBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(FactoryScreenHandlerType.MACERATOR, syncId, playerInventory, getBlockInventory(context, 2), getBlockPropertyDelegate(context, 4));
+public class PulverizerBlockGuiDescription extends SyncedGuiDescription {
+    public PulverizerBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(FactoryScreenHandlerType.PULVERIZER, syncId, playerInventory, getBlockInventory(context, 2), getBlockPropertyDelegate(context, 4));
 
         WGridPanel root = new WGridPanel();
         setRootPanel(root);

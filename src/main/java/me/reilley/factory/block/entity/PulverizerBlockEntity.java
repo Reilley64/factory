@@ -1,13 +1,13 @@
 package me.reilley.factory.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
-import me.reilley.factory.block.MaceratorBlock;
+import me.reilley.factory.block.PulverizerBlock;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.energy.FactoryEnergy;
 import me.reilley.factory.inventory.FactoryInventory;
 import me.reilley.factory.recipe.CrushingRecipe;
 import me.reilley.factory.registry.FactoryBlockEntityType;
-import me.reilley.factory.screen.MaceratorBlockGuiDescription;
+import me.reilley.factory.screen.PulverizerBlockGuiDescription;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -27,7 +27,7 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
-public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
+public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private static final int[] TOP_SLOTS = new int[]{0};
     private static final int[] BOTTOM_SLOTS = new int[]{1};
     private static final int[] SIDE_SLOTS = new int[]{1};
@@ -39,8 +39,8 @@ public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, 
     private int crushTimeTotal = 0;
     private ItemStack inputStack;
 
-    public MaceratorBlockEntity() {
-        super(FactoryBlockEntityType.MACERATOR);
+    public PulverizerBlockEntity() {
+        super(FactoryBlockEntityType.PULVERIZER);
         this.inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
         this.inputStack = ItemStack.EMPTY;
         this.propertyDelegate = new PropertyDelegate() {
@@ -205,7 +205,7 @@ public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inventory, PlayerEntity player) {
-        return new MaceratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
+        return new PulverizerBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
     }
 
     @Override
@@ -241,7 +241,7 @@ public class MaceratorBlockEntity extends BlockEntity implements FactoryEnergy, 
                 }
             }
 
-            MaceratorBlock.setActive(crushTimeTotal > 0, this.world, this.pos);
+            PulverizerBlock.setActive(crushTimeTotal > 0, this.world, this.pos);
         }
     }
 

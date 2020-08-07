@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "   ",
-    " R ",
-    "GFG"
+    "CR ",
+    "F  ",
+    "   "
   ],
   "key": {
     "F": {
@@ -12,8 +12,8 @@
     "R": {
       "item": "minecraft:redstone"
     },
-    "G": {
-      "item": "minecraft:gold_ingot"
+    "C": {
+      "item": "c:copper_ingot"
     }
   },
   "result": {

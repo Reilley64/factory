@@ -1,11 +1,11 @@
 {
   "type": "factory:crushing",
   "input": {
-    "item": "minecraft:iron_ore",
+    "item": "c:copper_ore",
     "count": 1
   },
   "output": {
-    "item": "c:iron_dust",
+    "item": "c:copper_dust",
     "count": 2
   },
   "crush_time": 200

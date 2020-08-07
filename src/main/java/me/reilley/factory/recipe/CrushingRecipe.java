@@ -64,7 +64,7 @@ public class CrushingRecipe implements Recipe<Inventory> {
 
     @Override
     public ItemStack getRecipeKindIcon() {
-        return new ItemStack(FactoryBlock.MACERATOR);
+        return new ItemStack(FactoryBlock.PULVERIZER);
     }
 
     @Override

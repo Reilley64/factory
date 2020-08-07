@@ -5,8 +5,8 @@ import me.reilley.factory.block.ElectricFurnaceBlock;
 import me.reilley.factory.screen.ElectricFurnaceBlockGuiDescription;
 import me.reilley.factory.block.GeneratorBlock;
 import me.reilley.factory.screen.GeneratorBlockGuiDescription;
-import me.reilley.factory.block.MaceratorBlock;
-import me.reilley.factory.screen.MaceratorBlockGuiDescription;
+import me.reilley.factory.block.PulverizerBlock;
+import me.reilley.factory.screen.PulverizerBlockGuiDescription;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.screen.QuarryBlockGuiDescription;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 public class FactoryScreenHandlerType {
     public static final ScreenHandlerType<ElectricFurnaceBlockGuiDescription> ELECTRIC_FURNACE = register(ElectricFurnaceBlock.ID, (syncId, inventory) -> new ElectricFurnaceBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
     public static final ScreenHandlerType<GeneratorBlockGuiDescription> GENERATOR = register(GeneratorBlock.ID, (syncId, inventory) -> new GeneratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
-    public static final ScreenHandlerType<MaceratorBlockGuiDescription> MACERATOR = register(MaceratorBlock.ID, (syncId, inventory) -> new MaceratorBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
+    public static final ScreenHandlerType<PulverizerBlockGuiDescription> PULVERIZER = register(PulverizerBlock.ID, (syncId, inventory) -> new PulverizerBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
     public static final ScreenHandlerType<QuarryBlockGuiDescription> QUARRY = register(QuarryBlock.ID, (syncId, inventory) -> new QuarryBlockGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY));
 
     public static void initialize() {

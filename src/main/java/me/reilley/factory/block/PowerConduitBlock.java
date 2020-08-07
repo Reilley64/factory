@@ -42,7 +42,7 @@ public class PowerConduitBlock extends BlockWithEntity {
     private final PowerConduitBlockShapeUtil frameShapeUtil;
 
     public PowerConduitBlock() {
-        super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
+        super(FabricBlockSettings.of(Material.STONE).strength(1, 8));
         setDefaultState(getStateManager().getDefaultState().with(EAST, false).with(WEST, false).with(NORTH, false)
                 .with(SOUTH, false).with(UP, false).with(DOWN, false));
         frameShapeUtil = new PowerConduitBlockShapeUtil(this);

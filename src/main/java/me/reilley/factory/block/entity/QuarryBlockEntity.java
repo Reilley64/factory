@@ -116,10 +116,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
     @Override
     public void onOpen(PlayerEntity player) {
         if (!player.isSpectator()) {
-            if (this.viewerCount < 0) {
-                this.viewerCount = 0;
-            }
-
+            if (this.viewerCount < 0) this.viewerCount = 0;
             ++this.viewerCount;
             this.onInvOpenOrClose();
         }

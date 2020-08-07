@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smelting",
   "ingredient": {
-    "item": "factory:diamond_dust"
+    "item": "c:diamond_dust"
   },
   "result": "minecraft:diamond",
   "experience": 0.5,
