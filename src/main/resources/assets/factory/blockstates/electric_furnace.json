@@ -1,12 +1,12 @@
 {
   "variants": {
-    "facing=north,active=false": { "model":  "factory:block/electric_furnace_unpowered" },
-    "facing=south,active=false": { "model":  "factory:block/electric_furnace_unpowered", "y": 180 },
-    "facing=west,active=false":  { "model":  "factory:block/electric_furnace_unpowered", "y": 270 },
-    "facing=east,active=false":  { "model":  "factory:block/electric_furnace_unpowered", "y": 90 },
-    "facing=north,active=true": { "model":  "factory:block/electric_furnace_powered" },
-    "facing=south,active=true": { "model":  "factory:block/electric_furnace_powered", "y": 180 },
-    "facing=west,active=true":  { "model":  "factory:block/electric_furnace_powered", "y": 270 },
-    "facing=east,active=true":  { "model":  "factory:block/electric_furnace_powered", "y": 90 }
+    "facing=north,active=false": { "model":  "factory:block/electric_furnace_inactive" },
+    "facing=south,active=false": { "model":  "factory:block/electric_furnace_inactive", "y": 180 },
+    "facing=west,active=false":  { "model":  "factory:block/electric_furnace_inactive", "y": 270 },
+    "facing=east,active=false":  { "model":  "factory:block/electric_furnace_inactive", "y": 90 },
+    "facing=north,active=true": { "model":  "factory:block/electric_furnace_active" },
+    "facing=south,active=true": { "model":  "factory:block/electric_furnace_active", "y": 180 },
+    "facing=west,active=true":  { "model":  "factory:block/electric_furnace_active", "y": 270 },
+    "facing=east,active=true":  { "model":  "factory:block/electric_furnace_active", "y": 90 }
   }
 }

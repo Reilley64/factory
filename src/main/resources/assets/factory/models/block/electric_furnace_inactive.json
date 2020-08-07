@@ -2,7 +2,7 @@
   "parent": "minecraft:block/orientable",
   "textures": {
     "top": "factory:block/electric_furnace_top",
-    "front": "factory:block/electric_furnace_unpowered",
+    "front": "factory:block/electric_furnace_inactive",
     "side": "factory:block/electric_furnace_side"
   }
 }

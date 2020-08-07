@@ -1,6 +1,7 @@
 package me.reilley.factory.block;
 
 import me.reilley.factory.block.entity.PowerConduitBlockEntity;
+import me.reilley.factory.block.entity.PulverizerBlockEntity;
 import me.reilley.factory.block.shapeutil.PowerConduitBlockShapeUtil;
 import me.reilley.factory.energy.FactoryEnergy;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -87,6 +88,8 @@ public class PowerConduitBlock extends BlockWithEntity {
 
     private Boolean canConnectTo(WorldAccess world, BlockPos pos, Direction facing) {
         if (world.getBlockEntity(pos) instanceof FactoryEnergy) {
+            if (world.getBlockEntity(pos) instanceof PulverizerBlockEntity && facing == Direction.UP)
+                return Boolean.FALSE;
             return Boolean.TRUE;
         }
         return Boolean.FALSE;

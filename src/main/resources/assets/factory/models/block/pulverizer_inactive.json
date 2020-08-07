@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "factory:block/pulverizer_top_inactive",
+    "front": "factory:block/pulverizer_side",
+    "side": "factory:block/pulverizer_side",
+    "bottom": "factory:block/pulverizer_side"
+  }
+}

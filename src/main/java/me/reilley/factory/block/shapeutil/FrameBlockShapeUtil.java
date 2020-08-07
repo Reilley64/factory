@@ -28,7 +28,7 @@ public final class FrameBlockShapeUtil {
     }
 
     private VoxelShape getStateShape(BlockState state) {
-        final double size = 4;
+        final double size = 5;
         final VoxelShape baseShape = Block.createCuboidShape(size, size, size, 16.0D - size, 16.0D - size, 16.0D - size);
         final List<VoxelShape> connections = new ArrayList<>();
         for (Direction dir : Direction.values()) {

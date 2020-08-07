@@ -2,7 +2,7 @@
   "parent": "minecraft:block/orientable",
   "textures": {
     "top": "factory:block/generator_top",
-    "front": "factory:block/generator_front_powered",
+    "front": "factory:block/generator_front_inactive",
     "side": "factory:block/generator_side"
   }
 }
