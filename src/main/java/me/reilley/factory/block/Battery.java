@@ -9,33 +9,57 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
-public class Battery extends BlockWithEntity implements InventoryProvider {
+public class Battery extends BlockWithEntity {
     public static final String ID = "battery";
+
+    public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
+    public static final IntProperty INDICATOR = IntProperty.of("indicator", 0, 7);
 
     private final BatteryShapeUtil batteryShapeUtil;
 
     public Battery() {
         super(FabricBlockSettings.of(Material.METAL).strength(5, 6));
-        this.setDefaultState(this.getStateManager().getDefaultState());
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(INDICATOR, 0));
         batteryShapeUtil = new BatteryShapeUtil(this);
+    }
+
+    public static void setFacing(Direction facing, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
+    }
+    public static void setIndicator(double energyMax, double energyCurrent, World world, BlockPos pos) {
+        int indicator = 0;
+        if (energyMax != 0 && energyCurrent != 0) {
+            int incrementAmount = ((int) energyMax) / 7;
+            indicator = ((int) energyCurrent) / incrementAmount;
+        }
+        world.setBlockState(pos, world.getBlockState(pos).with(INDICATOR, indicator));
     }
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.onPlaced(world, pos, state, placer, stack);
+        setFacing(placer.getHorizontalFacing().getOpposite(), world, pos);
+        setIndicator(1, 0, world, pos);
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, INDICATOR);
     }
 
     @Override
@@ -72,11 +96,6 @@ public class Battery extends BlockWithEntity implements InventoryProvider {
             }
             return ActionResult.CONSUME;
         }
-    }
-
-    @Override
-    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
-        return ((BatteryEntity) world.getBlockEntity(pos));
     }
 
     @Override

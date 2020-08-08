@@ -1,0 +1,19 @@
+{
+  "textures": {
+    "particle": "factory:block/battery_side",
+    "batteryside": "factory:block/battery_side",
+    "batterytop": "factory:block/battery_top"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 1],
+      "to": [9, 16, 2],
+      "shade": true,
+      "faces": {
+        "north": {"uv": [13, 0, 14, 16], "texture": "batteryside"},
+        "up": {"uv": [7, 1, 9, 2], "texture": "batterytop"},
+        "down": {"uv": [7, 1, 9, 2], "texture": "batterytop"}
+      }
+    }
+  ]
+}
