@@ -1,0 +1,31 @@
+{
+  "multipart": [
+    {
+      "apply": { "model": "factory:block/battery/battery_1" }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_2" }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_3" }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_2", "y": 90 }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_3", "y": 90 }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_2", "y": 180 }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_3", "y": 180 }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_2", "y": 270 }
+    },
+    {
+      "apply": { "model": "factory:block/battery/battery_3", "y": 270 }
+    }
+  ]
+}

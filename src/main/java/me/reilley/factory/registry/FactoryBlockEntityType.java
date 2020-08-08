@@ -1,16 +1,8 @@
 package me.reilley.factory.registry;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.block.PowerConduitBlock;
-import me.reilley.factory.block.entity.PowerConduitBlockEntity;
-import me.reilley.factory.block.ElectricFurnaceBlock;
-import me.reilley.factory.block.entity.ElectricFurnaceBlockEntity;
-import me.reilley.factory.block.GeneratorBlock;
-import me.reilley.factory.block.entity.GeneratorBlockEntity;
-import me.reilley.factory.block.PulverizerBlock;
-import me.reilley.factory.block.entity.PulverizerBlockEntity;
-import me.reilley.factory.block.QuarryBlock;
-import me.reilley.factory.block.entity.QuarryBlockEntity;
+import me.reilley.factory.block.*;
+import me.reilley.factory.block.entity.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -20,6 +12,7 @@ import net.minecraft.util.registry.Registry;
 import java.util.function.Supplier;
 
 public class FactoryBlockEntityType {
+    public static final BlockEntityType<BatteryEntity> BATTERY = register(Battery.ID, BatteryEntity::new, FactoryBlock.BATTERY);
     public static final BlockEntityType<ElectricFurnaceBlockEntity> ELECTRIC_FURNACE = register(ElectricFurnaceBlock.ID, ElectricFurnaceBlockEntity::new, FactoryBlock.ELECTRIC_FURNACE);
     public static final BlockEntityType<GeneratorBlockEntity> GENERATOR = register(GeneratorBlock.ID, GeneratorBlockEntity::new, FactoryBlock.GENERATOR);
     public static final BlockEntityType<PowerConduitBlockEntity> POWER_CONDUIT = register(PowerConduitBlock.ID, PowerConduitBlockEntity::new, FactoryBlock.POWER_CONDUIT);

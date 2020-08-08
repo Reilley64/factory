@@ -1,0 +1,21 @@
+{
+  "textures": {
+    "particle": "factory:block/battery_side",
+    "batteryside": "factory:block/battery_side",
+    "batterytop": "factory:block/battery_top"
+  },
+  "elements": [
+    {
+      "from": [4, 0, 2],
+      "to": [12, 16, 3],
+      "shade": true,
+      "faces": {
+        "north": {"uv": [0, 0, 8, 16], "texture": "batteryside"},
+        "east": {"uv": [0, 0, 8, 16], "texture": "batteryside"},
+        "west": {"uv": [0, 0, 8, 16], "texture": "batteryside"},
+        "up": {"uv": [4, 2, 12, 3], "texture": "batterytop"},
+        "down": {"uv": [4, 2, 12, 3], "texture": "batterytop"}
+      }
+    }
+  ]
+}

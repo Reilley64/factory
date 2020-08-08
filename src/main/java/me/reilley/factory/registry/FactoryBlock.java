@@ -1,17 +1,13 @@
 package me.reilley.factory.registry;
 
 import me.reilley.factory.Factory;
-import me.reilley.factory.block.PowerConduitBlock;
-import me.reilley.factory.block.ElectricFurnaceBlock;
-import me.reilley.factory.block.FrameBlock;
-import me.reilley.factory.block.GeneratorBlock;
-import me.reilley.factory.block.PulverizerBlock;
-import me.reilley.factory.block.QuarryBlock;
+import me.reilley.factory.block.*;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class FactoryBlock {
+    public static final Block BATTERY = register(Battery.ID, new Battery());
     public static final Block ELECTRIC_FURNACE = register(ElectricFurnaceBlock.ID, new ElectricFurnaceBlock());
     public static final Block FRAME = register(FrameBlock.ID, new FrameBlock());
     public static final Block GENERATOR = register(GeneratorBlock.ID, new GeneratorBlock());
