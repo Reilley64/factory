@@ -39,6 +39,7 @@ public class BatteryEntity extends BlockEntity implements FactoryEnergy, Propert
                 switch (index) {
                     case 0:
                         return (int) energy;
+
                     case 1:
                         return (int) getEnergyCapacity();
                 }
@@ -51,6 +52,7 @@ public class BatteryEntity extends BlockEntity implements FactoryEnergy, Propert
                     case 0:
                         energy = value;
                         break;
+
                     case 1:
                         break;
                 }
@@ -88,17 +90,17 @@ public class BatteryEntity extends BlockEntity implements FactoryEnergy, Propert
 
     @Override
     public double getEnergyCapacity() {
-        return 100;
+        return 40000;
     }
 
     @Override
     public double getMaxEnergyInput() {
-        return 1;
+        return 32;
     }
 
     @Override
     public double getMaxEnergyOutput() {
-        return 1;
+        return 32;
     }
 
     @Override
