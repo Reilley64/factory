@@ -44,17 +44,17 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
 
     @Override
     public double getEnergyCapacity() {
-        return 4;
+        return 512;
     }
 
     @Override
     public double getMaxEnergyInput() {
-        return 1;
+        return 128;
     }
 
     @Override
     public double getMaxEnergyOutput() {
-        return 1;
+        return 128;
     }
 
     @Override

@@ -129,12 +129,12 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
 
     @Override
     public double getEnergyCapacity() {
-        return 100;
+        return 416;
     }
 
     @Override
     public double getMaxEnergyInput() {
-        return 1;
+        return 32;
     }
 
     @Override
@@ -227,8 +227,8 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                         this.cookTimeTotal = recipe.getCookTime();
                     }
 
-                    if (this.energy > 1) {
-                        this.energy--;
+                    if (this.energy >= 3) {
+                        extractEnergy(3);
                         this.cookTime += 2;
                     }
 

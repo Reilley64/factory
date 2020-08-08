@@ -116,7 +116,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
     @Override
     public double getEnergyCapacity() {
-        return 1000;
+        return 4000;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
     @Override
     public double getMaxEnergyOutput() {
-        return 1;
+        return 10;
     }
 
     @Override
@@ -206,7 +206,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
                 burnTime = fuelTime;
                 inventory.get(0).decrement(1);
             } else if (burnTime > 0) {
-                if (energy != getEnergyCapacity()) energy += 1;
+                if (energy != getEnergyCapacity()) energy += Math.min(10, getEnergyCapacity() - energy);
                 burnTime--;
                 if (burnTime == 0) GeneratorBlock.setActive(false, this.world, this.pos);
             }

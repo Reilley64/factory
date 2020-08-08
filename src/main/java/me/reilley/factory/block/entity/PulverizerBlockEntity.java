@@ -128,12 +128,12 @@ public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy,
 
     @Override
     public double getEnergyCapacity() {
-        return 100;
+        return 1200;
     }
 
     @Override
     public double getMaxEnergyInput() {
-        return 1;
+        return 32;
     }
 
     @Override
@@ -226,8 +226,8 @@ public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy,
                         this.crushTimeTotal = recipe.getCrushTime();
                     }
 
-                    if (this.energy > 1) {
-                        this.energy--;
+                    if (this.energy >= 2) {
+                        extractEnergy(2);
                         this.crushTime++;
                     }
 
