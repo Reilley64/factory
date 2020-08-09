@@ -1,17 +1,26 @@
 package me.reilley.factory.block;
 
+import me.reilley.factory.Factory;
 import me.reilley.factory.block.entity.BatteryEntity;
 import me.reilley.factory.block.entity.PowerConduitBlockEntity;
 import me.reilley.factory.block.entity.PulverizerBlockEntity;
 import me.reilley.factory.block.shapeutil.PowerConduitBlockShapeUtil;
 import me.reilley.factory.energy.FactoryEnergy;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.mob.PiglinBrain;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -128,5 +137,24 @@ public class PowerConduitBlock extends BlockWithEntity {
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext shapeContext) {
         return frameShapeUtil.getShape(state);
+    }
+
+    public ExtendedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        return blockEntity instanceof ExtendedScreenHandlerFactory ? (ExtendedScreenHandlerFactory) blockEntity : null;
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            return ActionResult.SUCCESS;
+        } else {
+            ExtendedScreenHandlerFactory extendedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
+            if (extendedScreenHandlerFactory != null) {
+                player.openHandledScreen(extendedScreenHandlerFactory);
+                PiglinBrain.onGuardedBlockBroken(player, true);
+            }
+            return ActionResult.CONSUME;
+        }
     }
 }

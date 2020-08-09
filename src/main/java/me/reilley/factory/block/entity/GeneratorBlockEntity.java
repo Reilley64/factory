@@ -126,7 +126,7 @@ public class GeneratorBlockEntity extends BlockEntity implements FactoryEnergy, 
 
     @Override
     public double getMaxEnergyOutput() {
-        return 10;
+        return 32;
     }
 
     @Override

@@ -32,12 +32,14 @@ public interface FactoryEnergy {
             if (blockEntity instanceof FactoryEnergy) {
                 FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
                 if (factoryEnergyBlockEntity.getMaxEnergyInput() > 0)
-                    factoryEnergyBlockEntity.insertEnergy(extractEnergy(
-                            Math.min(
-                                    Math.min(getMaxEnergyOutput(), factoryEnergyBlockEntity.getMaxEnergyInput()),
-                                    factoryEnergyBlockEntity.getEnergyCapacity() - factoryEnergyBlockEntity.getEnergy()
+                    factoryEnergyBlockEntity.insertEnergy(
+                            extractEnergy(
+                                    Math.min(
+                                            Math.min(getMaxEnergyOutput(), factoryEnergyBlockEntity.getMaxEnergyInput()),
+                                            factoryEnergyBlockEntity.getEnergyCapacity() - factoryEnergyBlockEntity.getEnergy()
+                                    )
                             )
-                    ));
+                    );
             }
         }
     }
