@@ -76,12 +76,12 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
     @Override
     public double getEnergyCapacity() {
-        return 100;
+        return 1000;
     }
 
     @Override
     public double getMaxEnergyInput() {
-        return this.world.getBlockState(this.pos).get(QuarryBlock.ACTIVE) ? 1 : 0;
+        return this.world.getBlockState(this.pos).get(QuarryBlock.ACTIVE) ? 32 : 0;
     }
 
     @Override
@@ -307,7 +307,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
         @Override
         public int getEnergyRequired() {
-            return (int) (16 * (world.getBlockState(pos).getHardness(world, pos) * 2));
+            return (int) (32 * world.getBlockState(pos).getHardness(world, pos));
         }
 
         @Override
@@ -337,7 +337,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
         @Override
         public int getEnergyRequired() {
-            return 24;
+            return 32;
         }
 
         @Override
