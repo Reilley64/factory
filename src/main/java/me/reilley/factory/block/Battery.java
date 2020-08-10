@@ -47,7 +47,7 @@ public class Battery extends BlockWithEntity {
             int incrementAmount = ((int) energyMax) / 7;
             indicator = ((int) energyCurrent) / incrementAmount;
         }
-        world.setBlockState(pos, world.getBlockState(pos).with(INDICATOR, indicator));
+        world.setBlockState(pos, world.getBlockState(pos).with(INDICATOR, Math.min(7, Math.max(indicator, 0))));
     }
 
     @Override

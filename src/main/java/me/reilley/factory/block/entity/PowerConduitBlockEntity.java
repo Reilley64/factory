@@ -55,12 +55,14 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
     public void fromTag(BlockState state, CompoundTag tag) {
         super.fromTag(state, tag);
         this.energy = tag.getShort("Energy");
+        this.mode = PowerConduitBlock.Mode.valueOf(tag.getString("Mode"));
     }
 
     @Override
     public CompoundTag toTag(CompoundTag tag) {
         super.toTag(tag);
         tag.putShort("Energy", (short) this.energy);
+        tag.putString("Mode", this.mode.toString());
         return tag;
     }
 
