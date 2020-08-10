@@ -13,11 +13,29 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
     private final Direction startingDirection;
 
     public RectangularPrismIterator(BlockPos minPos, BlockPos maxPos, Direction startingDirection) {
-        this.currentPos = minPos;
-        this.minPos = minPos;
-        this.maxPos = maxPos;
         this.currentDirection = startingDirection;
         this.startingDirection = startingDirection;
+
+        switch (this.currentDirection) {
+            case NORTH:
+                this.currentPos = minPos.add(0, 0, 1);
+                break;
+
+            case EAST:
+                this.currentPos = minPos.add(-1, 0, 0);
+                break;
+
+            case SOUTH:
+                this.currentPos = minPos.add(0, 0, -1);
+                break;
+
+            case WEST:
+                this.currentPos = minPos.add(1, 0, 0);
+                break;
+        }
+
+        this.minPos = minPos;
+        this.maxPos = maxPos;
     }
 
     public BlockPos getMinPos() {

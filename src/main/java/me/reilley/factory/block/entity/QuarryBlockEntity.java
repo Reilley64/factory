@@ -238,7 +238,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
 
         @Override
         public int getEnergyRequired() {
-            return (int) (32 * world.getBlockState(pos).getHardness(world, pos));
+            return (int) ((32 * world.getBlockState(pos).getHardness(world, pos)) * 2);
         }
 
         @Override
