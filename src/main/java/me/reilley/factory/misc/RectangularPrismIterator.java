@@ -20,6 +20,14 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
         this.startingDirection = startingDirection;
     }
 
+    public BlockPos getMinPos() {
+        return minPos;
+    }
+
+    public BlockPos getMaxPos() {
+        return maxPos;
+    }
+
     @Override
     public boolean hasNext() {
         return !(currentPos.getX() == maxPos.getX() && currentPos.getY() == maxPos.getY() && currentPos.getZ() == maxPos.getZ());
@@ -98,7 +106,7 @@ public class RectangularPrismIterator implements Iterator<BlockPos> {
         }
 
         if (currentPos.getX() == maxPos.getX() && currentPos.getZ() == maxPos.getZ()) {
-            currentPos = new BlockPos(minPos.getX(), currentPos.getY() - 1, minPos.getZ());
+            currentPos = new BlockPos(minPos.getX(), maxPos.getY() > minPos.getY() ? currentPos.getY() + 1 : currentPos.getY() - 1, minPos.getZ());
             currentDirection = startingDirection;
             return currentPos;
         } else {

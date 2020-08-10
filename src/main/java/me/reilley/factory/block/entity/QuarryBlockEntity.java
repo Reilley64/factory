@@ -2,13 +2,16 @@ package me.reilley.factory.block.entity;
 
 import me.reilley.factory.block.FrameBlock;
 import me.reilley.factory.block.QuarryBlock;
-import me.reilley.factory.screen.QuarryBlockGuiDescription;
 import me.reilley.factory.energy.FactoryEnergy;
 import me.reilley.factory.inventory.FactoryInventory;
 import me.reilley.factory.misc.RectangularPrismIterator;
 import me.reilley.factory.registry.FactoryBlock;
 import me.reilley.factory.registry.FactoryBlockEntityType;
-import net.minecraft.block.*;
+import me.reilley.factory.screen.QuarryBlockGuiDescription;
+import net.minecraft.block.AirBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -30,20 +33,12 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, Tickable {
-    private final List<BlockPos> framePositions = new ArrayList<>();
     private DefaultedList<ItemStack> inventory;
     private double energy;
     private int viewerCount;
-    // TODO: remove these for frame iterator
-    private BlockPos targetBlock;
-    private int minX;
-    private int minZ;
-    private int maxX;
-    private int maxZ;
 
     public QuarryBlockEntity() {
         super(FactoryBlockEntityType.QUARRY);
@@ -141,29 +136,33 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
     @Override
     public void tick() {
         if (!this.world.isClient) {
-            if (this.targetBlock == null) initializeFrameBuild();
-
-            if (this.framePositions.size() != 64) {
-                this.framePositions.add(this.targetBlock);
-                while (getNextFramePos(this.targetBlock) != null) {
-                    this.framePositions.add(getNextFramePos(this.targetBlock));
-                    this.targetBlock = getNextFramePos(this.targetBlock);
-                }
-                return;
-            }
-
             if (this.world.getBlockState(this.pos).get(QuarryBlock.ACTIVE)) {
-                for (BlockPos blockPos : this.framePositions) {
-                    if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
-                        BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
-                        if (energy >= buildFrameTask.getEnergyRequired()) buildFrameTask.run();
-                        return;
+                RectangularPrismIterator frameIterator = initializeFrameIterator();
+                while (frameIterator.hasNext()) {
+                    BlockPos blockPos = frameIterator.next();
+                    if ((blockPos.getX() == frameIterator.getMinPos().getX() && blockPos.getY() == frameIterator.getMinPos().getY())
+                            || (blockPos.getX() == frameIterator.getMaxPos().getX() && blockPos.getY() == frameIterator.getMinPos().getY())
+                            || (blockPos.getX() == frameIterator.getMinPos().getX() && blockPos.getY() == frameIterator.getMaxPos().getY())
+                            || (blockPos.getX() == frameIterator.getMaxPos().getX() && blockPos.getY() == frameIterator.getMaxPos().getY())
+                            || (blockPos.getZ() == frameIterator.getMinPos().getZ() && blockPos.getY() == frameIterator.getMinPos().getY())
+                            || (blockPos.getZ() == frameIterator.getMaxPos().getZ() && blockPos.getY() == frameIterator.getMinPos().getY())
+                            || (blockPos.getZ() == frameIterator.getMinPos().getZ() && blockPos.getY() == frameIterator.getMaxPos().getY())
+                            || (blockPos.getZ() == frameIterator.getMaxPos().getZ() && blockPos.getY() == frameIterator.getMaxPos().getY())
+                            || (blockPos.getX() == frameIterator.getMinPos().getX() && blockPos.getZ() == frameIterator.getMinPos().getZ())
+                            || (blockPos.getX() == frameIterator.getMinPos().getX() && blockPos.getZ() == frameIterator.getMaxPos().getZ())
+                            || (blockPos.getX() == frameIterator.getMaxPos().getX() && blockPos.getZ() == frameIterator.getMaxPos().getZ())
+                            || (blockPos.getX() == frameIterator.getMaxPos().getX() && blockPos.getZ() == frameIterator.getMinPos().getZ())) {
+                        if (!(this.world.getBlockState(blockPos).getBlock() instanceof FrameBlock)) {
+                            BuildFrameTask buildFrameTask = new BuildFrameTask(blockPos);
+                            if (energy >= buildFrameTask.getEnergyRequired()) buildFrameTask.run();
+                            return;
+                        }
                     }
                 }
 
-                RectangularPrismIterator rectangularPrismIterator = initializeDigging();
-                while (rectangularPrismIterator.hasNext()) {
-                    BlockPos blockPos = rectangularPrismIterator.next();
+                RectangularPrismIterator digIterator = initializeDiggingIterator();
+                while (digIterator.hasNext()) {
+                    BlockPos blockPos = digIterator.next();
                     if (!(this.world.getBlockState(blockPos).getBlock() instanceof AirBlock
                             || this.world.getBlockState(blockPos).getHardness(this.world, blockPos) < 0.0F
                             || !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
@@ -180,97 +179,29 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
         }
     }
 
-    private void initializeFrameBuild() {
+    private RectangularPrismIterator initializeFrameIterator() {
         switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
             case NORTH:
-                targetBlock = this.pos.add(8, 0, 1);
-                minX = targetBlock.getX();
-                minZ = targetBlock.getZ();
-                maxX = minX - 16;
-                maxZ = minZ + 16;
-                break;
+                return new RectangularPrismIterator(this.pos.add(8, 0, 1),
+                        new BlockPos(this.pos.getX() + -8, this.pos.getY() + 15, this.pos.getZ() + 17), Direction.WEST);
 
             case EAST:
-                targetBlock = this.pos.add(-1, 0, 8);
-                minX = targetBlock.getX();
-                minZ = targetBlock.getZ();
-                maxX = minX - 16;
-                maxZ = minZ - 16;
-                break;
+                return new RectangularPrismIterator(this.pos.add(-1, 0, 8),
+                        new BlockPos(this.pos.getX() + -17, this.pos.getY() + 15, this.pos.getZ() + -8), Direction.NORTH);
 
             case SOUTH:
-                targetBlock = this.pos.add(-8, 0, -1);
-                minX = targetBlock.getX();
-                minZ = targetBlock.getZ();
-                maxX = minX + 16;
-                maxZ = minZ - 16;
-                break;
+                return new RectangularPrismIterator(this.pos.add(-8, 0, -1),
+                        new BlockPos(this.pos.getX() + 8, this.pos.getY() + 15, this.pos.getZ() + -17), Direction.EAST);
 
             case WEST:
-                targetBlock = this.pos.add(1, 0, -8);
-                minX = targetBlock.getX();
-                minZ = targetBlock.getZ();
-                maxX = minX + 16;
-                maxZ = minZ + 16;
-                break;
+                return new RectangularPrismIterator(this.pos.add(1, 0, -8),
+                        new BlockPos(this.pos.getX() + 17, this.pos.getY() + 15, this.pos.getZ() + 8), Direction.SOUTH);
         }
-    }
 
-    private BlockPos getNextFramePos(BlockPos currentPos) {
-        assert this.world != null;
-        switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
-            case NORTH:
-                if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ + 1))
-                    return null;
-                if (targetBlock.getX() > maxX && targetBlock.getZ() == minZ)
-                    return currentPos.add(-1, 0, 0);
-                if (targetBlock.getX() == maxX && targetBlock.getZ() < maxZ)
-                    return currentPos.add(0, 0, 1);
-                if (targetBlock.getZ() == maxZ && targetBlock.getX() < minX)
-                    return currentPos.add(1, 0, 0);
-                if (targetBlock.getX() == minX && targetBlock.getZ() > minZ)
-                    return currentPos.add(0, 0, -1);
-
-            case EAST:
-                if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX - 1))
-                    return null;
-                if (targetBlock.getZ() > maxZ && targetBlock.getX() == minX)
-                    return currentPos.add(0, 0, -1);
-                if (targetBlock.getZ() == maxZ && targetBlock.getX() > maxX)
-                    return currentPos.add(-1, 0, 0);
-                if (targetBlock.getX() == maxX && targetBlock.getZ() < minZ)
-                    return currentPos.add(0, 0, 1);
-                if (targetBlock.getZ() == minZ && targetBlock.getX() < minX)
-                    return currentPos.add(1, 0, 0);
-
-            case SOUTH:
-                if (targetBlock.getX() == minX && targetBlock.getZ() == (minZ - 1))
-                    return null;
-                if (targetBlock.getX() < maxX && targetBlock.getZ() == minZ)
-                    return currentPos.add(1, 0, 0);
-                if (targetBlock.getX() == maxX && targetBlock.getZ() > maxZ)
-                    return currentPos.add(0, 0, -1);
-                if (targetBlock.getZ() == maxZ && targetBlock.getX() > minX)
-                    return currentPos.add(-1, 0, 0);
-                if (targetBlock.getX() == minX && targetBlock.getZ() < minZ)
-                    return currentPos.add(0, 0, 1);
-
-            case WEST:
-                if (targetBlock.getZ() == minZ && targetBlock.getX() == (minX + 1))
-                    return null;
-                if (targetBlock.getZ() < maxZ && targetBlock.getX() == minX)
-                    return currentPos.add(0, 0, 1);
-                if (targetBlock.getZ() == maxZ && targetBlock.getX() < maxX)
-                    return currentPos.add(1, 0, 0);
-                if (targetBlock.getX() == maxX && targetBlock.getZ() > minZ)
-                    return currentPos.add(0, 0, -1);
-                if (targetBlock.getZ() == minZ && targetBlock.getX() > minX)
-                    return currentPos.add(-1, 0, 0);
-        }
         return null;
     }
 
-    private RectangularPrismIterator initializeDigging() {
+    private RectangularPrismIterator initializeDiggingIterator() {
         switch (this.world.getBlockState(this.pos).get(QuarryBlock.FACING)) {
             case NORTH:
                 return new RectangularPrismIterator(this.pos.add(7, 14, 2),
