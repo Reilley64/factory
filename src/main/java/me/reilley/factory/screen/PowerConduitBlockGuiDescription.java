@@ -1,6 +1,8 @@
 package me.reilley.factory.screen;
 
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
+import io.github.cottonmc.cotton.gui.widget.WButton;
+import io.github.cottonmc.cotton.gui.widget.WDynamicLabel;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WToggleButton;
 import io.netty.buffer.Unpooled;
@@ -16,34 +18,24 @@ import net.minecraft.util.math.BlockPos;
 
 public class PowerConduitBlockGuiDescription extends SyncedGuiDescription {
     public PowerConduitBlockGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, BlockPos blockPos) {
-        super(FactoryScreenHandlerType.POWER_CONDUIT, syncId, playerInventory, getBlockInventory(context, 1), getBlockPropertyDelegate(context, 2));
+        super(FactoryScreenHandlerType.POWER_CONDUIT, syncId, playerInventory, getBlockInventory(context, 1), getBlockPropertyDelegate(context));
 
         WGridPanel root = new WGridPanel();
         setRootPanel(root);
         root.setSize(100, 0);
 
-        WToggleButton extractButton = new WToggleButton(new LiteralText("Extract"));
-        System.out.println(((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).isExtract());
-        extractButton.setToggle(((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).isExtract());
-        extractButton.setOnToggle((on) -> {
-            PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
-            packetByteBuf.writeBlockPos(blockPos);
-            packetByteBuf.writeBoolean(on);
-            ClientSidePacketRegistry.INSTANCE.sendToServer(Factory.POWER_CONDUIT_EXTRACT, packetByteBuf);
-            ((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).setExtract(on);
-        });
-        root.add(extractButton, 0, 1);
+        WDynamicLabel mode = new WDynamicLabel(() -> ((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).getMode().asString());
+        root.add(mode, 0, 1);
 
-        WToggleButton insertButton = new WToggleButton(new LiteralText("Insert"));
-        insertButton.setToggle(((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).isInsert());
-        insertButton.setOnToggle((on) -> {
+        WButton changeMode = new WButton(new LiteralText("Change mode"));
+        changeMode.setSize(20, 100);
+        changeMode.setOnClick(() -> {
             PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
             packetByteBuf.writeBlockPos(blockPos);
-            packetByteBuf.writeBoolean(on);
-            ClientSidePacketRegistry.INSTANCE.sendToServer(Factory.POWER_CONDUIT_INSERT, packetByteBuf);
-            ((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).setInsert(on);
+            ClientSidePacketRegistry.INSTANCE.sendToServer(Factory.POWER_CONDUIT_MODE, packetByteBuf);
+            ((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).nextMode();
         });
-        root.add(insertButton, 0, 2);
+        root.add(changeMode, 1, 2);
 
         root.validate(this);
     }

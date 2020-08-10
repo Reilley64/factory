@@ -1,6 +1,5 @@
 package me.reilley.factory.block;
 
-import me.reilley.factory.Factory;
 import me.reilley.factory.block.entity.BatteryEntity;
 import me.reilley.factory.block.entity.PowerConduitBlockEntity;
 import me.reilley.factory.block.entity.PulverizerBlockEntity;
@@ -13,13 +12,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -28,34 +27,23 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class PowerConduitBlock extends BlockWithEntity {
     public static final String ID = "powerconduit";
 
-    public static final BooleanProperty EAST = BooleanProperty.of("east");
-    public static final BooleanProperty WEST = BooleanProperty.of("west");
-    public static final BooleanProperty NORTH = BooleanProperty.of("north");
-    public static final BooleanProperty SOUTH = BooleanProperty.of("south");
-    public static final BooleanProperty UP = BooleanProperty.of("up");
-    public static final BooleanProperty DOWN = BooleanProperty.of("down");
-
-    public static final Map<Direction, BooleanProperty> PROPERTY_MAP = Util.make(new HashMap<>(), map -> {
-        map.put(Direction.EAST, EAST);
-        map.put(Direction.WEST, WEST);
-        map.put(Direction.NORTH, NORTH);
-        map.put(Direction.SOUTH, SOUTH);
-        map.put(Direction.UP, UP);
-        map.put(Direction.DOWN, DOWN);
-    });
+    public static final BooleanProperty NORTH = Properties.NORTH;
+    public static final BooleanProperty EAST = Properties.EAST;
+    public static final BooleanProperty SOUTH = Properties.SOUTH;
+    public static final BooleanProperty WEST = Properties.WEST;
+    public static final BooleanProperty UP = Properties.UP;
+    public static final BooleanProperty DOWN = Properties.DOWN;
+    public static final EnumProperty<Mode> MODE = EnumProperty.of("mode", Mode.class);
 
     private final PowerConduitBlockShapeUtil frameShapeUtil;
 
     public PowerConduitBlock() {
         super(FabricBlockSettings.of(Material.STONE).strength(1, 8));
         setDefaultState(getStateManager().getDefaultState().with(EAST, false).with(WEST, false).with(NORTH, false)
-                .with(SOUTH, false).with(UP, false).with(DOWN, false));
+                .with(SOUTH, false).with(UP, false).with(DOWN, false).with(MODE, Mode.NONE));
         frameShapeUtil = new PowerConduitBlockShapeUtil(this);
     }
 
@@ -114,7 +102,7 @@ public class PowerConduitBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(EAST, WEST, NORTH, SOUTH, UP, DOWN);
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, MODE);
     }
 
     @Override
@@ -155,6 +143,27 @@ public class PowerConduitBlock extends BlockWithEntity {
                 PiglinBrain.onGuardedBlockBroken(player, true);
             }
             return ActionResult.CONSUME;
+        }
+    }
+
+    public enum Mode implements StringIdentifiable {
+        NONE("none"),
+        EXTRACT("extract"),
+        INSERT("insert");
+
+        private final String name;
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return this.asString();
+        }
+
+        @Override
+        public String asString() {
+            return name;
         }
     }
 }

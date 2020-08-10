@@ -1,6 +1,6 @@
 package me.reilley.factory.block.entity;
 
-import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
+import me.reilley.factory.block.PowerConduitBlock;
 import me.reilley.factory.energy.FactoryEnergy;
 import me.reilley.factory.registry.FactoryBlockEntityType;
 import me.reilley.factory.screen.PowerConduitBlockGuiDescription;
@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,62 +23,32 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 
-public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnergy, ExtendedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
+public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnergy, ExtendedScreenHandlerFactory, Tickable {
     private double energy = 0;
-    private boolean extract = false;
-    private boolean insert = false;
-    private final PropertyDelegate propertyDelegate;
+    private PowerConduitBlock.Mode mode = PowerConduitBlock.Mode.NONE;
 
     public PowerConduitBlockEntity() {
         super(FactoryBlockEntityType.POWER_CONDUIT);
-        this.propertyDelegate = new PropertyDelegate() {
-            @Override
-            public int get(int index) {
-                switch (index) {
-                    case 0:
-                        return extract ? 1 : 0;
-
-                    case 1:
-                        return insert ? 1 : 0;
-                }
-
-                return -1;
-            }
-
-            @Override
-            public void set(int index, int value) {
-                switch (index) {
-                    case 0:
-                        extract = value == 1;
-                        break;
-
-                    case 1:
-                        insert = value == 1;
-                        break;
-                }
-            }
-
-            @Override
-            public int size() {
-                return 2;
-            }
-        };
     }
 
-    public boolean isExtract() {
-        return extract;
+    public PowerConduitBlock.Mode getMode() {
+        return mode;
     }
 
-    public void setExtract(boolean extract) {
-        this.extract = extract;
-    }
+    public void nextMode() {
+        switch (mode) {
+            case NONE:
+                this.mode = PowerConduitBlock.Mode.EXTRACT;
+                break;
 
-    public boolean isInsert() {
-        return insert;
-    }
+            case EXTRACT:
+                this.mode = PowerConduitBlock.Mode.INSERT;
+                break;
 
-    public void setInsert(boolean insert) {
-        this.insert = insert;
+            case INSERT:
+                this.mode = PowerConduitBlock.Mode.NONE;
+                break;
+        }
     }
 
     @Override
@@ -112,12 +81,12 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
 
     @Override
     public double getMaxEnergyInput() {
-        return extract ? 128 : 0;
+        return mode == PowerConduitBlock.Mode.EXTRACT ? 128 : 0;
     }
 
     @Override
     public double getMaxEnergyOutput() {
-        return insert ? 128 : 0;
+        return mode == PowerConduitBlock.Mode.INSERT ? 128 : 0;
     }
 
     @Override
@@ -165,10 +134,5 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         return new PowerConduitBlockGuiDescription(syncId, inv, ScreenHandlerContext.create(this.world, this.pos), pos);
-    }
-
-    @Override
-    public PropertyDelegate getPropertyDelegate() {
-        return this.propertyDelegate;
     }
 }

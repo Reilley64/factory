@@ -29,8 +29,7 @@ public class Factory implements ModInitializer {
     public static final Identifier HELLO_ID = new Identifier(MOD_ID, "hello");
     public static SoundEvent HELLO_EVENT = new SoundEvent(HELLO_ID);
 
-    public static Identifier POWER_CONDUIT_EXTRACT = new Identifier(MOD_ID, "power_conduit_extract");
-    public static Identifier POWER_CONDUIT_INSERT = new Identifier(MOD_ID, "power_conduit_insert");
+    public static Identifier POWER_CONDUIT_MODE = new Identifier(MOD_ID, "power_conduit_mode");
 
     @Override
     public void onInitialize() {
@@ -42,21 +41,11 @@ public class Factory implements ModInitializer {
         CRUSHING = Registry.register(Registry.RECIPE_SERIALIZER, CrushingRecipe.Serializer.ID, CrushingRecipe.Serializer.INSTANCE);
         Registry.register(Registry.SOUND_EVENT, Factory.HELLO_ID, HELLO_EVENT);
 
-        ServerSidePacketRegistry.INSTANCE.register(POWER_CONDUIT_EXTRACT, (packetContext, attachedData) -> {
+        ServerSidePacketRegistry.INSTANCE.register(POWER_CONDUIT_MODE, (packetContext, attachedData) -> {
             BlockPos blockPos = attachedData.readBlockPos();
             packetContext.getTaskQueue().execute(() -> {
                 if (packetContext.getPlayer().world.canPlayerModifyAt(packetContext.getPlayer(), blockPos))
-                    ((PowerConduitBlockEntity) packetContext.getPlayer().world.getBlockEntity(blockPos))
-                            .setExtract(!((PowerConduitBlockEntity) packetContext.getPlayer().world.getBlockEntity(blockPos)).isExtract());
-            });
-        });
-
-        ServerSidePacketRegistry.INSTANCE.register(POWER_CONDUIT_INSERT, (packetContext, attachedData) -> {
-            BlockPos blockPos = attachedData.readBlockPos();
-            packetContext.getTaskQueue().execute(() -> {
-                if (packetContext.getPlayer().world.canPlayerModifyAt(packetContext.getPlayer(), blockPos))
-                    ((PowerConduitBlockEntity) packetContext.getPlayer().world.getBlockEntity(blockPos))
-                            .setInsert(!((PowerConduitBlockEntity) packetContext.getPlayer().world.getBlockEntity(blockPos)).isInsert());
+                    ((PowerConduitBlockEntity) packetContext.getPlayer().world.getBlockEntity(blockPos)).nextMode();
             });
         });
     }
