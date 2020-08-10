@@ -85,20 +85,6 @@ public class Battery extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient) {
-            return ActionResult.SUCCESS;
-        } else {
-            NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
-            if (namedScreenHandlerFactory != null) {
-                player.openHandledScreen(namedScreenHandlerFactory);
-                PiglinBrain.onGuardedBlockBroken(player, true);
-            }
-            return ActionResult.CONSUME;
-        }
-    }
-
-    @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext shapeContext) {
         return batteryShapeUtil.getShape(state);
     }

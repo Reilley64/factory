@@ -36,6 +36,12 @@ public class PowerConduitBlock extends BlockWithEntity {
     public static final BooleanProperty WEST = Properties.WEST;
     public static final BooleanProperty UP = Properties.UP;
     public static final BooleanProperty DOWN = Properties.DOWN;
+    public static final BooleanProperty NORTH_CONNECTION = BooleanProperty.of("north_connection");
+    public static final BooleanProperty EAST_CONNECTION = BooleanProperty.of("east_connection");
+    public static final BooleanProperty SOUTH_CONNECTION = BooleanProperty.of("south_connection");
+    public static final BooleanProperty WEST_CONNECTION = BooleanProperty.of("west_connection");
+    public static final BooleanProperty UP_CONNECTION = BooleanProperty.of("up_connection");
+    public static final BooleanProperty DOWN_CONNECTION = BooleanProperty.of("down_connection");
     public static final EnumProperty<Mode> MODE = EnumProperty.of("mode", Mode.class);
 
     private final PowerConduitBlockShapeUtil frameShapeUtil;
@@ -43,7 +49,9 @@ public class PowerConduitBlock extends BlockWithEntity {
     public PowerConduitBlock() {
         super(FabricBlockSettings.of(Material.STONE).strength(1, 8));
         setDefaultState(getStateManager().getDefaultState().with(EAST, false).with(WEST, false).with(NORTH, false)
-                .with(SOUTH, false).with(UP, false).with(DOWN, false).with(MODE, Mode.NONE));
+                .with(SOUTH, false).with(UP, false).with(DOWN, false).with(NORTH_CONNECTION, false)
+                .with(EAST_CONNECTION, false).with(SOUTH_CONNECTION, false).with(WEST_CONNECTION, false)
+                .with(UP_CONNECTION, false).with(DOWN_CONNECTION, false).with(MODE, Mode.NONE));
         frameShapeUtil = new PowerConduitBlockShapeUtil(this);
     }
 
@@ -79,13 +87,34 @@ public class PowerConduitBlock extends BlockWithEntity {
         Boolean east = canConnectTo(world, pos.east(), Direction.WEST);
         Boolean south = canConnectTo(world, pos.south(), Direction.NORTH);
         Boolean west = canConnectTo(world, pos.west(), Direction.WEST);
+        Boolean downConnection = canConnectToNonCable(world, pos.offset(Direction.DOWN, 1), Direction.UP);
+        Boolean upConnection = canConnectToNonCable(world, pos.up(), Direction.DOWN);
+        Boolean northConnection = canConnectToNonCable(world, pos.north(), Direction.SOUTH);
+        Boolean eastConnection = canConnectToNonCable(world, pos.east(), Direction.WEST);
+        Boolean southConnection = canConnectToNonCable(world, pos.south(), Direction.NORTH);
+        Boolean westConnection = canConnectToNonCable(world, pos.west(), Direction.WEST);
 
         return this.getDefaultState().with(DOWN, down).with(UP, up).with(NORTH, north).with(EAST, east)
-                .with(SOUTH, south).with(WEST, west);
+                .with(SOUTH, south).with(WEST, west).with(NORTH_CONNECTION, northConnection).with(EAST_CONNECTION, eastConnection)
+                .with(SOUTH_CONNECTION, southConnection).with(WEST_CONNECTION, westConnection).with(UP_CONNECTION, upConnection)
+                .with(DOWN_CONNECTION, downConnection);
     }
 
     private Boolean canConnectTo(WorldAccess world, BlockPos pos, Direction facing) {
         if (world.getBlockEntity(pos) instanceof FactoryEnergy) {
+            if (world.getBlockEntity(pos) instanceof PulverizerBlockEntity && facing == Direction.UP)
+                return Boolean.FALSE;
+            if (world.getBlockEntity(pos) instanceof BatteryEntity && !(facing == Direction.UP || facing == Direction.DOWN))
+                return Boolean.FALSE;
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    private Boolean canConnectToNonCable(WorldAccess world, BlockPos pos, Direction facing) {
+        if (world.getBlockEntity(pos) instanceof FactoryEnergy) {
+            if (world.getBlockEntity(pos) instanceof PowerConduitBlockEntity)
+                return Boolean.FALSE;
             if (world.getBlockEntity(pos) instanceof PulverizerBlockEntity && facing == Direction.UP)
                 return Boolean.FALSE;
             if (world.getBlockEntity(pos) instanceof BatteryEntity && !(facing == Direction.UP || facing == Direction.DOWN))
@@ -102,7 +131,8 @@ public class PowerConduitBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, MODE);
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, NORTH_CONNECTION, EAST_CONNECTION, SOUTH_CONNECTION, WEST_CONNECTION,
+                UP_CONNECTION, DOWN_CONNECTION, MODE);
     }
 
     @Override

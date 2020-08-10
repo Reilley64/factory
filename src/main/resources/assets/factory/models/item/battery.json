@@ -1,3 +1,6 @@
 {
-  "parent": "factory:block/battery/battery_1"
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "factory:block/battery_item"
+  }
 }

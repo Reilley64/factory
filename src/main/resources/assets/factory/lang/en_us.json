@@ -3,6 +3,9 @@
 
   "itemGroup.factory.general": "Factory Mod",
 
+  "item.factory.battery": "Battery",
+  "block.factory.battery": "Battery",
+
   "item.factory.coal_dust": "Coal Dust",
 
   "item.factory.diamond_dust": "Diamond Dust",

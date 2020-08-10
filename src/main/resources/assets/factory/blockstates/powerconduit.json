@@ -28,6 +28,55 @@
     {
       "when": { "down": "true" },
       "apply": { "model": "factory:block/powerconduit/powerconduit_side", "x": 90 }
+    },
+
+    {
+      "when": { "north_connection": "true", "mode": "extract" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_extract" }
+    },
+    {
+      "when": { "east_connection": "true", "mode": "extract" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_extract", "y": 90 }
+    },
+    {
+      "when": { "south_connection": "true", "mode": "extract" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_extract", "y": 180 }
+    },
+    {
+      "when": { "west_connection": "true", "mode": "extract" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_extract", "y": 270 }
+    },
+    {
+      "when": { "up_connection": "true", "mode": "extract" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_extract", "x": 270}
+    },
+    {
+      "when": { "down_connection": "true", "mode": "extract" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_extract", "x": 90 }
+    },
+    {
+      "when": { "north_connection": "true", "mode": "insert" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_insert" }
+    },
+    {
+      "when": { "east_connection": "true", "mode": "insert" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_insert", "y": 90 }
+    },
+    {
+      "when": { "south_connection": "true", "mode": "insert" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_insert", "y": 180 }
+    },
+    {
+      "when": { "west_connection": "true", "mode": "insert" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_insert", "y": 270 }
+    },
+    {
+      "when": { "up_connection": "true", "mode": "insert" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_insert", "x": 270}
+    },
+    {
+      "when": { "down_connection": "true", "mode": "insert" },
+      "apply": { "model": "factory:block/powerconduit/powerconduit_insert", "x": 90 }
     }
   ]
 }
