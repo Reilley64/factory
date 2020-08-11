@@ -120,7 +120,11 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
 
     @Override
     public void tick() {
-        if (!this.world.isClient) energyTick(this.world, this.pos);
+        if (!this.world.isClient) {
+            if (this.world.getBlockState(this.pos).get(PowerConduitBlock.MODE) != mode)
+                PowerConduitBlock.setMode(mode, world, pos);
+            energyTick(this.world, this.pos);
+        }
     }
 
     @Override

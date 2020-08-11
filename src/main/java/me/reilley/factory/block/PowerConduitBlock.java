@@ -80,6 +80,10 @@ public class PowerConduitBlock extends BlockWithEntity {
         }
     }
 
+    public static void setMode(Mode mode, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(MODE, mode));
+    }
+
     private BlockState makeConnections(World world, BlockPos pos) {
         Boolean down = canConnectTo(world, pos.offset(Direction.DOWN, 1), Direction.UP);
         Boolean up = canConnectTo(world, pos.up(), Direction.DOWN);
