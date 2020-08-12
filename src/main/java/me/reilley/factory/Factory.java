@@ -1,5 +1,6 @@
 package me.reilley.factory;
 
+import me.reilley.factory.block.PowerConduitBlock;
 import me.reilley.factory.block.entity.PowerConduitBlockEntity;
 import me.reilley.factory.recipe.CrushingRecipe;
 import me.reilley.factory.registry.FactoryBlock;
@@ -45,7 +46,7 @@ public class Factory implements ModInitializer {
             BlockPos blockPos = attachedData.readBlockPos();
             packetContext.getTaskQueue().execute(() -> {
                 if (packetContext.getPlayer().world.canPlayerModifyAt(packetContext.getPlayer(), blockPos))
-                    ((PowerConduitBlockEntity) packetContext.getPlayer().world.getBlockEntity(blockPos)).nextMode();
+                    PowerConduitBlock.nextMode(packetContext.getPlayer().world, blockPos);
             });
         });
     }

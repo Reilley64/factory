@@ -6,6 +6,7 @@ import io.github.cottonmc.cotton.gui.widget.WDynamicLabel;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.netty.buffer.Unpooled;
 import me.reilley.factory.Factory;
+import me.reilley.factory.block.PowerConduitBlock;
 import me.reilley.factory.block.entity.PowerConduitBlockEntity;
 import me.reilley.factory.registry.FactoryScreenHandlerType;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -23,7 +24,7 @@ public class PowerConduitBlockGuiDescription extends SyncedGuiDescription {
         setRootPanel(root);
         root.setSize(100, 0);
 
-        WDynamicLabel mode = new WDynamicLabel(() -> ((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).getMode().asString());
+        WDynamicLabel mode = new WDynamicLabel(() -> this.world.getBlockState(blockPos).get(PowerConduitBlock.MODE).asString());
         root.add(mode, 0, 1);
 
         WButton changeMode = new WButton(new LiteralText("Change mode"));
@@ -32,7 +33,7 @@ public class PowerConduitBlockGuiDescription extends SyncedGuiDescription {
             PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
             packetByteBuf.writeBlockPos(blockPos);
             ClientSidePacketRegistry.INSTANCE.sendToServer(Factory.POWER_CONDUIT_MODE, packetByteBuf);
-            ((PowerConduitBlockEntity) world.getBlockEntity(blockPos)).nextMode();
+            PowerConduitBlock.nextMode(this.world, blockPos);
         });
         root.add(changeMode, 1, 2);
 

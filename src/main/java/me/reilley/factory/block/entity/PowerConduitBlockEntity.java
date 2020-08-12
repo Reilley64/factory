@@ -25,44 +25,21 @@ import java.util.ArrayList;
 
 public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnergy, ExtendedScreenHandlerFactory, Tickable {
     private double energy = 0;
-    private PowerConduitBlock.Mode mode = PowerConduitBlock.Mode.NONE;
 
     public PowerConduitBlockEntity() {
         super(FactoryBlockEntityType.POWER_CONDUIT);
-    }
-
-    public PowerConduitBlock.Mode getMode() {
-        return mode;
-    }
-
-    public void nextMode() {
-        switch (mode) {
-            case NONE:
-                this.mode = PowerConduitBlock.Mode.EXTRACT;
-                break;
-
-            case EXTRACT:
-                this.mode = PowerConduitBlock.Mode.INSERT;
-                break;
-
-            case INSERT:
-                this.mode = PowerConduitBlock.Mode.NONE;
-                break;
-        }
     }
 
     @Override
     public void fromTag(BlockState state, CompoundTag tag) {
         super.fromTag(state, tag);
         this.energy = tag.getShort("Energy");
-        this.mode = PowerConduitBlock.Mode.getEnum(tag.getString("Mode"));
     }
 
     @Override
     public CompoundTag toTag(CompoundTag tag) {
         super.toTag(tag);
         tag.putShort("Energy", (short) this.energy);
-        tag.putString("Mode", this.mode.toString());
         return tag;
     }
 
@@ -83,12 +60,12 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
 
     @Override
     public double getMaxEnergyInput() {
-        return mode == PowerConduitBlock.Mode.EXTRACT ? 128 : 0;
+        return this.world.getBlockState(this.pos).get(PowerConduitBlock.MODE) == PowerConduitBlock.Mode.EXTRACT ? 128 : 0;
     }
 
     @Override
     public double getMaxEnergyOutput() {
-        return mode == PowerConduitBlock.Mode.INSERT ? 128 : 0;
+        return this.world.getBlockState(this.pos).get(PowerConduitBlock.MODE) == PowerConduitBlock.Mode.INSERT ? 128 : 0;
     }
 
     @Override
@@ -120,11 +97,7 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
 
     @Override
     public void tick() {
-        if (!this.world.isClient) {
-            if (this.world.getBlockState(this.pos).get(PowerConduitBlock.MODE) != mode)
-                PowerConduitBlock.setMode(mode, world, pos);
-            energyTick(this.world, this.pos);
-        }
+        if (!this.world.isClient) energyTick(this.world, this.pos);
     }
 
     @Override

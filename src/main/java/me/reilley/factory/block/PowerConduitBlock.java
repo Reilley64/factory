@@ -55,8 +55,20 @@ public class PowerConduitBlock extends BlockWithEntity {
         frameShapeUtil = new PowerConduitBlockShapeUtil(this);
     }
 
-    public static void setMode(Mode mode, World world, BlockPos pos) {
-        world.setBlockState(pos, world.getBlockState(pos).with(MODE, mode));
+    public static void nextMode(World world, BlockPos pos) {
+        switch (world.getBlockState(pos).get(MODE)) {
+            case NONE:
+                world.setBlockState(pos, world.getBlockState(pos).with(MODE, Mode.EXTRACT));
+                break;
+
+            case EXTRACT:
+                world.setBlockState(pos, world.getBlockState(pos).with(MODE, Mode.INSERT));
+                break;
+
+            case INSERT:
+                world.setBlockState(pos, world.getBlockState(pos).with(MODE, Mode.NONE));
+                break;
+        }
     }
 
     public BooleanProperty getProperty(Direction facing) {
@@ -191,19 +203,9 @@ public class PowerConduitBlock extends BlockWithEntity {
             this.name = name;
         }
 
-        public String toString() {
-            return this.asString();
-        }
-
         @Override
         public String asString() {
             return name;
-        }
-
-        public static Mode getEnum(String value) {
-            for (Mode mode : Mode.values())
-                if (mode.asString().equals(value)) return mode;
-            throw new IllegalArgumentException();
         }
     }
 }

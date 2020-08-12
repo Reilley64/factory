@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "RRR",
+    "CRC",
     "GIG",
     "DPD"
   ],
@@ -20,6 +20,9 @@
     },
     "R": {
       "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "c:copper_ingot"
     }
   },
   "result": {
