@@ -165,7 +165,7 @@ public class QuarryBlockEntity extends BlockEntity implements FactoryEnergy, Fac
                     BlockPos blockPos = digIterator.next();
                     if (!(this.world.getBlockState(blockPos).getBlock() instanceof AirBlock
                             || this.world.getBlockState(blockPos).getHardness(this.world, blockPos) < 0.0F
-                            || !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock)
+                            || (blockPos.add(0, 1, 0).getY() < digIterator.getMaxPos().getY() && !(this.world.getBlockState(blockPos.add(0, 1, 0)).getBlock() instanceof AirBlock))
                             || (!(this.world.getBlockState(blockPos).getFluidState().getFluid() instanceof EmptyFluid)
                             && !this.world.getBlockState(blockPos).getFluidState().isStill()))) {
                         DigBlockTask digBlockTask = new DigBlockTask(blockPos);

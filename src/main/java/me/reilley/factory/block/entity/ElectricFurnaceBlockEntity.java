@@ -229,10 +229,10 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     private void craftRecipe(@Nullable Recipe<?> recipe) {
         if (recipe != null && this.canAcceptRecipeOutput(recipe)) {
             ItemStack itemStack = this.inventory.get(0);
-            ItemStack itemStack2 = recipe.getOutput();
-            ItemStack itemStack3 = this.inventory.get(1);
-            if (itemStack3.isEmpty()) this.inventory.set(1, itemStack2.copy());
-            else if (itemStack3.getItem() == itemStack2.getItem()) itemStack3.increment(1);
+            ItemStack itemStack2 = this.inventory.get(1);
+            if (itemStack2.isEmpty()) this.inventory.set(1, recipe.getOutput().copy());
+            else if (itemStack2.getItem() == recipe.getOutput().getItem())
+                itemStack2.increment(recipe.getOutput().getCount());
             itemStack.decrement(1);
         }
     }
@@ -253,7 +253,6 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
                             this.cookTime = 0;
                             this.cookTimeTotal = this.getCookTime();
                             this.craftRecipe(recipe);
-                            this.inventory.get(0).decrement(1);
                         }
                     }
                 } else this.cookTime = 0;

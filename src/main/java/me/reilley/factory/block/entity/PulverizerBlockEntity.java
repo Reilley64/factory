@@ -231,10 +231,10 @@ public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy,
     private void craftRecipe(@Nullable Recipe<?> recipe) {
         if (recipe != null && this.canAcceptRecipeOutput(recipe)) {
             ItemStack itemStack = this.inventory.get(0);
-            ItemStack itemStack2 = recipe.getOutput();
-            ItemStack itemStack3 = this.inventory.get(1);
-            if (itemStack3.isEmpty()) this.inventory.set(1, itemStack2.copy());
-            else if (itemStack3.getItem() == itemStack2.getItem()) itemStack3.increment(1);
+            ItemStack itemStack2 = this.inventory.get(1);
+            if (itemStack2.isEmpty()) this.inventory.set(1, recipe.getOutput().copy());
+            else if (itemStack2.getItem() == recipe.getOutput().getItem())
+                itemStack2.increment(recipe.getOutput().getCount());
             itemStack.decrement(1);
         }
     }
@@ -255,7 +255,6 @@ public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy,
                             this.crushTime = 0;
                             this.crushTimeTotal = this.getCrushTime();
                             this.craftRecipe(recipe);
-                            this.inventory.get(0).decrement(1);
                         }
                     }
                 } else this.crushTime = 0;
