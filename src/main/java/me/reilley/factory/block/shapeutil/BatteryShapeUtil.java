@@ -1,11 +1,9 @@
 package me.reilley.factory.block.shapeutil;
 
 import me.reilley.factory.block.Battery;
-import me.reilley.factory.block.FrameBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 

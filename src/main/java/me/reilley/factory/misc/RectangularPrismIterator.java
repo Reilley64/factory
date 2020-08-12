@@ -6,11 +6,11 @@ import net.minecraft.util.math.Direction;
 import java.util.Iterator;
 
 public class RectangularPrismIterator implements Iterator<BlockPos> {
-    private BlockPos currentPos;
     private final BlockPos minPos;
     private final BlockPos maxPos;
-    private Direction currentDirection;
     private final Direction startingDirection;
+    private BlockPos currentPos;
+    private Direction currentDirection;
 
     public RectangularPrismIterator(BlockPos minPos, BlockPos maxPos, Direction startingDirection) {
         this.currentDirection = startingDirection;

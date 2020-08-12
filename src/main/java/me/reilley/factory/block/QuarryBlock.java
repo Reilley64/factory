@@ -37,12 +37,12 @@ public class QuarryBlock extends BlockWithEntity implements InventoryProvider {
         this.setDefaultState(this.getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(ACTIVE, true));
     }
 
-    public void setFacing(Direction facing, World world, BlockPos pos) {
-        world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
-    }
-
     public static void setActive(Boolean active, World world, BlockPos pos) {
         world.setBlockState(pos, world.getBlockState(pos).with(ACTIVE, active));
+    }
+
+    public void setFacing(Direction facing, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
     }
 
     @Override

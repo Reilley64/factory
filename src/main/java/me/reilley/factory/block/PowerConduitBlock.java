@@ -55,6 +55,10 @@ public class PowerConduitBlock extends BlockWithEntity {
         frameShapeUtil = new PowerConduitBlockShapeUtil(this);
     }
 
+    public static void setMode(Mode mode, World world, BlockPos pos) {
+        world.setBlockState(pos, world.getBlockState(pos).with(MODE, mode));
+    }
+
     public BooleanProperty getProperty(Direction facing) {
         switch (facing) {
             case EAST:
@@ -78,10 +82,6 @@ public class PowerConduitBlock extends BlockWithEntity {
             default:
                 return EAST;
         }
-    }
-
-    public static void setMode(Mode mode, World world, BlockPos pos) {
-        world.setBlockState(pos, world.getBlockState(pos).with(MODE, mode));
     }
 
     private BlockState makeConnections(World world, BlockPos pos) {
@@ -133,10 +133,9 @@ public class PowerConduitBlock extends BlockWithEntity {
         return BlockRenderType.MODEL;
     }
 
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, NORTH_CONNECTION, EAST_CONNECTION, SOUTH_CONNECTION, WEST_CONNECTION,
-                UP_CONNECTION, DOWN_CONNECTION, MODE);
+    public ExtendedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        return blockEntity instanceof ExtendedScreenHandlerFactory ? (ExtendedScreenHandlerFactory) blockEntity : null;
     }
 
     @Override
@@ -150,20 +149,16 @@ public class PowerConduitBlock extends BlockWithEntity {
     }
 
     @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, NORTH_CONNECTION, EAST_CONNECTION, SOUTH_CONNECTION, WEST_CONNECTION,
+                UP_CONNECTION, DOWN_CONNECTION, MODE);
+    }
+
+    @Override
     public BlockState getStateForNeighborUpdate(BlockState ourState, Direction ourFacing, BlockState otherState,
                                                 WorldAccess worldIn, BlockPos ourPos, BlockPos otherPos) {
         Boolean value = canConnectTo(worldIn, otherPos, ourFacing.getOpposite());
         return ourState.with(getProperty(ourFacing), value);
-    }
-
-    @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext shapeContext) {
-        return frameShapeUtil.getShape(state);
-    }
-
-    public ExtendedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        return blockEntity instanceof ExtendedScreenHandlerFactory ? (ExtendedScreenHandlerFactory) blockEntity : null;
     }
 
     @Override
@@ -178,6 +173,11 @@ public class PowerConduitBlock extends BlockWithEntity {
             }
             return ActionResult.CONSUME;
         }
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext shapeContext) {
+        return frameShapeUtil.getShape(state);
     }
 
     public enum Mode implements StringIdentifiable {
@@ -198,6 +198,12 @@ public class PowerConduitBlock extends BlockWithEntity {
         @Override
         public String asString() {
             return name;
+        }
+
+        public static Mode getEnum(String value) {
+            for (Mode mode : Mode.values())
+                if (mode.asString().equals(value)) return mode;
+            throw new IllegalArgumentException();
         }
     }
 }

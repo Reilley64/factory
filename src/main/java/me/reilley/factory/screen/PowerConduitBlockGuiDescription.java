@@ -4,7 +4,6 @@ import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WDynamicLabel;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
-import io.github.cottonmc.cotton.gui.widget.WToggleButton;
 import io.netty.buffer.Unpooled;
 import me.reilley.factory.Factory;
 import me.reilley.factory.block.entity.PowerConduitBlockEntity;

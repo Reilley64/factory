@@ -55,7 +55,7 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
     public void fromTag(BlockState state, CompoundTag tag) {
         super.fromTag(state, tag);
         this.energy = tag.getShort("Energy");
-        this.mode = PowerConduitBlock.Mode.valueOf(tag.getString("Mode"));
+        this.mode = PowerConduitBlock.Mode.getEnum(tag.getString("Mode"));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class PowerConduitBlockEntity extends BlockEntity implements FactoryEnerg
         for (Direction side : Direction.values()) {
             BlockEntity blockEntity = getWorld().getBlockEntity(this.pos.offset(side));
             if (blockEntity instanceof FactoryEnergy) {
-                if (blockEntity instanceof  PowerConduitBlockEntity) cables.add((PowerConduitBlockEntity) blockEntity);
+                if (blockEntity instanceof PowerConduitBlockEntity) cables.add((PowerConduitBlockEntity) blockEntity);
                 else {
                     FactoryEnergy factoryEnergyBlockEntity = (FactoryEnergy) blockEntity;
                     if (factoryEnergyBlockEntity.getMaxEnergyInput() > 0)

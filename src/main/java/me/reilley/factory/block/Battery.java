@@ -6,18 +6,12 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.PiglinBrain;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -26,10 +20,8 @@ import net.minecraft.world.World;
 
 public class Battery extends BlockWithEntity {
     public static final String ID = "battery";
-
-    public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
     public static final IntProperty INDICATOR = IntProperty.of("indicator", 0, 7);
-
+    public static DirectionProperty FACING = DirectionProperty.of("facing", Direction.Type.HORIZONTAL);
     private final BatteryShapeUtil batteryShapeUtil;
 
     public Battery() {
@@ -41,6 +33,7 @@ public class Battery extends BlockWithEntity {
     public static void setFacing(Direction facing, World world, BlockPos pos) {
         world.setBlockState(pos, world.getBlockState(pos).with(FACING, facing));
     }
+
     public static void setIndicator(double energyMax, double energyCurrent, World world, BlockPos pos) {
         int indicator = 0;
         if (energyMax != 0 && energyCurrent != 0) {

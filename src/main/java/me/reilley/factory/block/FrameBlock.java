@@ -85,8 +85,8 @@ public class FrameBlock extends Block {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public BlockState getPlacementState(ItemPlacementContext context) {
+        return makeConnections(context.getWorld(), context.getBlockPos());
     }
 
     @Override
@@ -95,15 +95,15 @@ public class FrameBlock extends Block {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        return makeConnections(context.getWorld(), context.getBlockPos());
-    }
-
-    @Override
     public BlockState getStateForNeighborUpdate(BlockState ourState, Direction ourFacing, BlockState otherState,
                                                 WorldAccess worldIn, BlockPos ourPos, BlockPos otherPos) {
         Boolean value = canConnectTo(worldIn, otherPos, ourFacing.getOpposite());
         return ourState.with(getProperty(ourFacing), value);
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 
     @Override
