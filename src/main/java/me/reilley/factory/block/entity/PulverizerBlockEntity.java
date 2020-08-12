@@ -1,6 +1,8 @@
 package me.reilley.factory.block.entity;
 
+import blue.endless.jankson.annotation.Nullable;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
+import me.reilley.factory.block.ElectricFurnaceBlock;
 import me.reilley.factory.block.PulverizerBlock;
 import me.reilley.factory.block.QuarryBlock;
 import me.reilley.factory.energy.FactoryEnergy;
@@ -26,6 +28,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 
 public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private static final int[] TOP_SLOTS = new int[]{0};
@@ -157,6 +160,19 @@ public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy,
         return this.isValid(slot, stack);
     }
 
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        ItemStack itemStack = this.inventory.get(slot);
+        this.inventory.set(slot, stack);
+        boolean bl = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(itemStack) && ItemStack.areTagsEqual(stack, itemStack);
+        if (stack.getCount() > this.getMaxCountPerStack()) stack.setCount(this.getMaxCountPerStack());
+        if (slot == 0 && !bl) {
+            this.crushTimeTotal = this.getCrushTime();
+            this.crushTime = 0;
+            this.markDirty();
+        }
+    }
+
     private void onInvOpenOrClose() {
         Block block = this.getCachedState().getBlock();
         if (block instanceof QuarryBlock) {
@@ -208,40 +224,45 @@ public class PulverizerBlockEntity extends BlockEntity implements FactoryEnergy,
         return new PulverizerBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
     }
 
+    protected int getCrushTime() {
+        return this.world.getRecipeManager().getFirstMatch(CrushingRecipe.Type.INSTANCE, this, this.world).map(CrushingRecipe::getCrushTime).orElse(200);
+    }
+
+    private void craftRecipe(@Nullable Recipe<?> recipe) {
+        if (recipe != null && this.canAcceptRecipeOutput(recipe)) {
+            ItemStack itemStack = this.inventory.get(0);
+            ItemStack itemStack2 = recipe.getOutput();
+            ItemStack itemStack3 = this.inventory.get(1);
+            if (itemStack3.isEmpty()) this.inventory.set(1, itemStack2.copy());
+            else if (itemStack3.getItem() == itemStack2.getItem()) itemStack3.increment(1);
+            itemStack.decrement(1);
+        }
+    }
+
     @Override
     public void tick() {
         if (!this.world.isClient) {
-            if (!this.inventory.get(0).isItemEqual(inputStack)) {
-                this.inputStack = ItemStack.EMPTY;
-                this.crushTime = 0;
-                this.crushTimeTotal = 0;
-            }
-
-            if (!this.inventory.get(0).isEmpty()) {
+            if (this.inventory.get(0).isEmpty()) {
+                this.crushTime = MathHelper.clamp(this.crushTime - 2, 0, this.crushTimeTotal);
+            } else {
                 CrushingRecipe recipe = this.world.getRecipeManager().getFirstMatch(CrushingRecipe.Type.INSTANCE, this, this.world).orElse(null);
-
-                if (recipe != null) {
-                    if (this.crushTimeTotal == 0 && canAcceptRecipeOutput(recipe)) {
-                        this.inputStack = this.inventory.get(0);
-                        this.crushTimeTotal = recipe.getCrushTime();
-                    }
-
+                if (this.canAcceptRecipeOutput(recipe)) {
                     if (this.energy >= 2) {
                         extractEnergy(2);
                         this.crushTime++;
-                    }
 
-                    if (crushTime == crushTimeTotal) {
-                        if (this.inventory.get(1).isEmpty()) this.inventory.set(1, recipe.getOutput().copy());
-                        else this.inventory.get(1).increment(recipe.getOutput().getCount());
-                        this.inventory.get(0).decrement(1);
-                        this.crushTime = 0;
-                        this.crushTimeTotal = 0;
+                        if (this.crushTime >= this.crushTimeTotal) {
+                            this.crushTime = 0;
+                            this.crushTimeTotal = this.getCrushTime();
+                            this.craftRecipe(recipe);
+                            this.inventory.get(0).decrement(1);
+                        }
                     }
-                }
+                } else this.crushTime = 0;
             }
 
-            PulverizerBlock.setActive(crushTimeTotal > 0, this.world, this.pos);
+            if (this.world.getBlockState(this.pos).get(PulverizerBlock.ACTIVE) != crushTimeTotal > 0)
+                PulverizerBlock.setActive(crushTimeTotal > 0, this.world, this.pos);
         }
     }
 

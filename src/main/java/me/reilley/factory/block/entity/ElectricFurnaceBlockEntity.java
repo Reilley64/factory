@@ -1,5 +1,6 @@
 package me.reilley.factory.block.entity;
 
+import blue.endless.jankson.annotation.Nullable;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import me.reilley.factory.block.ElectricFurnaceBlock;
 import me.reilley.factory.block.QuarryBlock;
@@ -15,6 +16,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
@@ -27,6 +29,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 
 public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEnergy, FactoryInventory, NamedScreenHandlerFactory, PropertyDelegateHolder, Tickable {
     private static final int[] TOP_SLOTS = new int[]{0};
@@ -38,12 +41,10 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
     private double energy = 0;
     private int cookTime = 0;
     private int cookTimeTotal = 0;
-    private ItemStack inputStack;
 
     public ElectricFurnaceBlockEntity() {
         super(FactoryBlockEntityType.ELECTRIC_FURNACE);
         this.inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
-        this.inputStack = ItemStack.EMPTY;
         this.propertyDelegate = new PropertyDelegate() {
             @Override
             public int get(int index) {
@@ -96,7 +97,6 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         super.fromTag(state, tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
         Inventories.fromTag(tag, this.inventory);
-        this.inputStack = this.inventory.get(0);
         this.energy = tag.getShort("Energy");
         this.cookTime = tag.getShort("CookTime");
         this.cookTimeTotal = tag.getShort("CookTimeTotal");
@@ -158,6 +158,19 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         return this.isValid(slot, stack);
     }
 
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        ItemStack itemStack = this.inventory.get(slot);
+        this.inventory.set(slot, stack);
+        boolean bl = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(itemStack) && ItemStack.areTagsEqual(stack, itemStack);
+        if (stack.getCount() > this.getMaxCountPerStack()) stack.setCount(this.getMaxCountPerStack());
+        if (slot == 0 && !bl) {
+            this.cookTimeTotal = this.getCookTime();
+            this.cookTime = 0;
+            this.markDirty();
+        }
+    }
+
     private void onInvOpenOrClose() {
         Block block = this.getCachedState().getBlock();
         if (block instanceof QuarryBlock) {
@@ -209,40 +222,45 @@ public class ElectricFurnaceBlockEntity extends BlockEntity implements FactoryEn
         return new ElectricFurnaceBlockGuiDescription(syncId, inventory, ScreenHandlerContext.create(this.world, this.pos));
     }
 
+    protected int getCookTime() {
+        return this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, this, this.world).map(AbstractCookingRecipe::getCookTime).orElse(200);
+    }
+
+    private void craftRecipe(@Nullable Recipe<?> recipe) {
+        if (recipe != null && this.canAcceptRecipeOutput(recipe)) {
+            ItemStack itemStack = this.inventory.get(0);
+            ItemStack itemStack2 = recipe.getOutput();
+            ItemStack itemStack3 = this.inventory.get(1);
+            if (itemStack3.isEmpty()) this.inventory.set(1, itemStack2.copy());
+            else if (itemStack3.getItem() == itemStack2.getItem()) itemStack3.increment(1);
+            itemStack.decrement(1);
+        }
+    }
+
     @Override
     public void tick() {
         if (!this.world.isClient) {
-            if (!this.inventory.get(0).isItemEqual(inputStack)) {
-                this.inputStack = ItemStack.EMPTY;
-                this.cookTime = 0;
-                this.cookTimeTotal = 0;
-            }
-
-            if (!this.inventory.get(0).isEmpty()) {
+            if (this.inventory.get(0).isEmpty()) {
+                this.cookTime = MathHelper.clamp(this.cookTime - 2, 0, this.cookTimeTotal);
+            } else {
                 SmeltingRecipe recipe = this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, this, this.world).orElse(null);
-
-                if (recipe != null) {
-                    if (this.cookTimeTotal == 0 && canAcceptRecipeOutput(recipe)) {
-                        this.inputStack = this.inventory.get(0);
-                        this.cookTimeTotal = recipe.getCookTime();
-                    }
-
+                if (this.canAcceptRecipeOutput(recipe)) {
                     if (this.energy >= 3) {
                         extractEnergy(3);
                         this.cookTime += 2;
-                    }
 
-                    if (cookTime == cookTimeTotal) {
-                        if (this.inventory.get(1).isEmpty()) this.inventory.set(1, recipe.getOutput().copy());
-                        else this.inventory.get(1).increment(recipe.getOutput().getCount());
-                        this.inventory.get(0).decrement(1);
-                        this.cookTime = 0;
-                        this.cookTimeTotal = 0;
+                        if (this.cookTime >= this.cookTimeTotal) {
+                            this.cookTime = 0;
+                            this.cookTimeTotal = this.getCookTime();
+                            this.craftRecipe(recipe);
+                            this.inventory.get(0).decrement(1);
+                        }
                     }
-                }
+                } else this.cookTime = 0;
             }
 
-            ElectricFurnaceBlock.setActive(cookTimeTotal > 0, this.world, this.pos);
+            if (this.world.getBlockState(this.pos).get(ElectricFurnaceBlock.ACTIVE) != cookTimeTotal > 0)
+                ElectricFurnaceBlock.setActive(cookTimeTotal > 0, this.world, this.pos);
         }
     }
 
